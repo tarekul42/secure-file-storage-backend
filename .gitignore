@@ -14,8 +14,8 @@ api/*.js.map
 api/*.d.ts
 api/*.d.ts.map
 
-# Prisma generated client (regenerate via `npm run prisma:generate`)
-src/generated/
+# Prisma generated client is committed intentionally (custom output path).
+# Regenerate locally via `npm run prisma:generate` after schema changes.
 
 # AI / agent tooling (not part of the deliverable)
 .agents/
