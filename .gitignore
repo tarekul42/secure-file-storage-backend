@@ -9,6 +9,10 @@ node_modules/
 # Build output
 dist/
 *.tsbuildinfo
+api/*.js
+api/*.js.map
+api/*.d.ts
+api/*.d.ts.map
 
 # Prisma generated client (regenerate via `npm run prisma:generate`)
 src/generated/
