@@ -1,6 +1,6 @@
 import cors from "cors";
 import express from "express";
-import * as helmetModule from "helmet";
+import helmet from "helmet";
 import morgan from "morgan";
 import { allowedOrigins, env } from "./config/env.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
@@ -12,7 +12,7 @@ export const createApp = (): express.Express => {
 
   app.set("trust proxy", 1);
 
-  app.use(helmetModule.default());
+  app.use(helmet());
   app.use(
     cors({
       origin: allowedOrigins,
