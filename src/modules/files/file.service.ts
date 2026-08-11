@@ -13,8 +13,8 @@ import { ApiError } from "../../utils/errors.js";
 import { FILE_LIMITS } from "./file.constants.js";
 import type {
   CreateFileMetadataInput,
-  DownloadResult,
   DownloadPublicInput,
+  DownloadResult,
   GetDownloadUrlInput,
   RequestUploadInput,
   RequestUploadResult,
@@ -157,5 +157,4 @@ export const getDownloadUrl = async (
 
 export const getPublicShare = async (
   input: DownloadPublicInput,
-): Promise<DownloadResult> =>
-  getDownloadUrl({ fileId: input.fileId });
+): Promise<DownloadResult> => getDownloadUrl({ fileId: input.fileId });

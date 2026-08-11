@@ -1,4 +1,4 @@
-import type { NextFunction, Request } from "express";
+import type { Request } from "express";
 
 export interface AuthenticatedRequest extends Request {
   userId?: string;

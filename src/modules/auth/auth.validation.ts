@@ -7,7 +7,10 @@ export const registerSchema = {
       .string()
       .trim()
       .email("A valid email address is required")
-      .max(EMAIL_MAX_LENGTH, `Email must be at most ${EMAIL_MAX_LENGTH} characters`),
+      .max(
+        EMAIL_MAX_LENGTH,
+        `Email must be at most ${EMAIL_MAX_LENGTH} characters`,
+      ),
     password: z
       .string()
       .min(

@@ -1,11 +1,7 @@
 import type { Request, Response } from "express";
-import { asyncHandler } from "../../utils/async-handler.js";
 import type { AuthenticatedRequest } from "../../middleware/types.js";
-import {
-  getUserById,
-  loginUser,
-  registerUser,
-} from "./auth.service.js";
+import { asyncHandler } from "../../utils/async-handler.js";
+import { getUserById, loginUser, registerUser } from "./auth.service.js";
 
 export const register = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {

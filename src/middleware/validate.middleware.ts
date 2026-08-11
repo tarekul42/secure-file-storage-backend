@@ -1,5 +1,5 @@
-import type { ZodType } from "zod";
 import type { NextFunction, Request, Response } from "express";
+import type { ZodType } from "zod";
 import { ApiError, type ApiErrorDetail } from "../utils/errors.js";
 
 interface ValidationParts {

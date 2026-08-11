@@ -3,7 +3,10 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import { allowedOrigins, env } from "./config/env.js";
-import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
+import {
+  errorHandler,
+  notFoundHandler,
+} from "./middleware/error.middleware.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import fileRoutes from "./modules/files/file.routes.js";
 
