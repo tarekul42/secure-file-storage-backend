@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  files     File[]
+  createdAt DateTime @default(now())
+}
+
+model File {
+  id          String      @id @default(uuid())
+  fileName    String
+  s3Key       String
+  fileSize    Int
+  mimeType    String
+  visibility  Visibility  @default(PRIVATE)
+  ownerId     String
+  owner       User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+}
