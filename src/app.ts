@@ -15,7 +15,7 @@ export const createApp = (): express.Express => {
 
   app.set("trust proxy", 1);
 
-  app.use(helmet());
+  app.use((helmet as unknown as () => express.RequestHandler)());
   app.use(
     cors({
       origin: allowedOrigins,
