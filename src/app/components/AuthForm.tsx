@@ -111,7 +111,11 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
             disabled={submitting}
             className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? "Please wait…" : isLogin ? "Log in" : "Create account"}
+            {submitting
+              ? "Please wait…"
+              : isLogin
+                ? "Log in"
+                : "Create account"}
           </button>
         </form>
 
@@ -140,14 +144,20 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
           {isLogin ? (
             <>
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="font-medium text-blue-600 hover:underline">
+              <Link
+                href="/register"
+                className="font-medium text-blue-600 hover:underline"
+              >
                 Register
               </Link>
             </>
           ) : (
             <>
               Already have an account?{" "}
-              <Link href="/login" className="font-medium text-blue-600 hover:underline">
+              <Link
+                href="/login"
+                className="font-medium text-blue-600 hover:underline"
+              >
                 Log in
               </Link>
             </>

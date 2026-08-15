@@ -7,7 +7,8 @@ import api, { getErrorMessage } from "@/lib/api";
 import type { DownloadResponse } from "@/lib/types";
 
 function formatFileSize(bytes: number): string {
-  if (bytes >= 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  if (bytes >= 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   return `${(bytes / 1024).toFixed(1)} KB`;
 }
@@ -71,7 +72,7 @@ export default function SharePage() {
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950">
           <FileIcon className="h-7 w-7 text-blue-600" />
         </div>
-        <h1 className="mt-4 break-words text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        <h1 className="mt-4 wrap-break-word text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           {share.fileName}
         </h1>
         <p className="mt-1 text-sm text-zinc-500">

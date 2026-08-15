@@ -10,7 +10,8 @@ import api from "@/lib/api";
 import type { DownloadResponse, FileItem } from "@/lib/types";
 
 function formatFileSize(bytes: number): string {
-  if (bytes >= 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  if (bytes >= 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   return `${(bytes / 1024).toFixed(1)} KB`;
 }
@@ -54,7 +55,9 @@ export default function Dashboard() {
 
   const handleDownload = async (file: FileItem) => {
     try {
-      const { data } = await api.get<DownloadResponse>(`/files/${file.id}/download`);
+      const { data } = await api.get<DownloadResponse>(
+        `/files/${file.id}/download`,
+      );
       window.open(data.downloadUrl, "_blank");
     } catch (err) {
       setError(getErrorMessage(err));
@@ -77,8 +80,7 @@ export default function Dashboard() {
     const url = `${window.location.origin}/share/${file.id}`;
     try {
       await navigator.clipboard.writeText(url);
-    } catch {
-    }
+    } catch {}
   };
 
   return (
@@ -134,7 +136,8 @@ export default function Dashboard() {
                     {file.fileName}
                   </p>
                   <p className="text-sm text-zinc-500">
-                    {formatFileSize(file.fileSize)} · {file.mimeType || "Unknown type"}
+                    {formatFileSize(file.fileSize)} ·{" "}
+                    {file.mimeType || "Unknown type"}
                   </p>
                 </div>
 
@@ -146,7 +149,11 @@ export default function Dashboard() {
                         ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                         : "bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300"
                     }`}
-                    title={file.visibility === "PUBLIC" ? "Make private" : "Make public"}
+                    title={
+                      file.visibility === "PUBLIC"
+                        ? "Make private"
+                        : "Make public"
+                    }
                   >
                     {file.visibility === "PUBLIC" ? "Public" : "Private"}
                   </button>
