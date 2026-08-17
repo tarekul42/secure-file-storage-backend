@@ -2,14 +2,14 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
-  S3Client,
-  type S3ClientConfig,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "crypto";
 import { env } from "../../config/env.js";
+import { s3 } from "../../db/s3.js";
 import { prisma } from "../../db/prisma.js";
 import { ApiError } from "../../utils/errors.js";
+import { logger } from "../../utils/logger.js";
 import { FILE_LIMITS } from "./file.constants.js";
 import type {
   CreateFileMetadataInput,
@@ -20,15 +20,6 @@ import type {
   RequestUploadResult,
   Visibility,
 } from "./file.interfaces.js";
-
-const s3Config: S3ClientConfig = {
-  region: env.AWS_REGION,
-};
-if (env.S3_ENDPOINT) {
-  s3Config.endpoint = env.S3_ENDPOINT;
-  s3Config.forcePathStyle = env.AWS_FORCE_PATH_STYLE;
-}
-const s3 = new S3Client(s3Config);
 
 const sanitizeFileName = (fileName: string): string =>
   fileName.replace(/[\\/]+/g, "_").slice(0, FILE_LIMITS.MAX_FILENAME_LENGTH);
@@ -116,7 +107,10 @@ export const deleteFile = async (userId: string, fileId: string) => {
       }),
     );
   } catch (error) {
-    console.error("Failed to delete S3 object, removing metadata only:", error);
+    logger.error(
+      { error, s3Key: file.s3Key },
+      "Failed to delete S3 object, removing metadata only",
+    );
   }
 
   await prisma.file.delete({ where: { id: file.id } });
