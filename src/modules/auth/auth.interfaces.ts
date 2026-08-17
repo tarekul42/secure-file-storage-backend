@@ -21,5 +21,15 @@ export interface AuthUser {
 
 export interface AuthResult {
   token: string;
+  refreshToken: string;
   user: AuthUser;
+}
+
+export interface RefreshResult {
+  token: string;
+  refreshToken: string;
+}
+
+export interface RefreshTokenInput {
+  refreshToken: string;
 }

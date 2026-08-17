@@ -30,3 +30,9 @@ export const loginSchema = {
     password: z.string().min(1, "Password is required"),
   }),
 };
+
+export const refreshTokenSchema = {
+  body: z.object({
+    refreshToken: z.string().trim().min(1, "refreshToken is required"),
+  }),
+};

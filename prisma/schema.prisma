@@ -13,11 +13,24 @@ enum Visibility {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  files     File[]
-  createdAt DateTime @default(now())
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  files         File[]
+  refreshTokens RefreshToken[]
+  createdAt     DateTime       @default(now())
+}
+
+model RefreshToken {
+  id           String     @id @default(uuid())
+  tokenHash    String     @unique
+  familyId     String
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt    DateTime
+  replacedById String?    @unique
+  revokedAt    DateTime?
+  createdAt    DateTime   @default(now())
 }
 
 model File {
