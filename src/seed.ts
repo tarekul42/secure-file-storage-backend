@@ -19,7 +19,9 @@ if (existing) {
     where: { email: DEMO_EMAIL },
     data: { password: hashedPassword },
   });
-  console.log(`Demo user already exists; password synced to "${DEMO_PASSWORD}"`);
+  console.log(
+    `Demo user already exists; password synced to "${DEMO_PASSWORD}"`,
+  );
 } else {
   await prisma.user.create({
     data: { email: DEMO_EMAIL, password: hashedPassword },
