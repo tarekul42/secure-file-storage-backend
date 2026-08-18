@@ -132,6 +132,15 @@ export const updateFileVisibility = async (
 export const deleteFile = async (userId: string, fileId: string) => {
   const file = await getOwnedFile(userId, fileId);
 
+  await prisma.$transaction([
+    prisma.file.delete({ where: { id: file.id } }),
+    prisma.$executeRaw`
+      UPDATE "User"
+      SET "storageUsed" = GREATEST(0, "storageUsed" - ${file.fileSize})
+      WHERE "id" = ${userId}
+    `,
+  ]);
+
   try {
     await s3.send(
       new DeleteObjectCommand({
@@ -142,18 +151,9 @@ export const deleteFile = async (userId: string, fileId: string) => {
   } catch (error) {
     logger.error(
       { error, s3Key: file.s3Key },
-      "Failed to delete S3 object, removing metadata only",
+      "S3 object delete failed; will be cleaned up by the reconcile job",
     );
   }
-
-  await prisma.$transaction([
-    prisma.file.delete({ where: { id: file.id } }),
-    prisma.$executeRaw`
-      UPDATE "User"
-      SET "storageUsed" = GREATEST(0, "storageUsed" - ${file.fileSize})
-      WHERE "id" = ${userId}
-    `,
-  ]);
 };
 
 export const getDownloadUrl = async (
