@@ -16,6 +16,8 @@ model User {
   id            String         @id @default(uuid())
   email         String         @unique
   password      String
+  storageUsed   BigInt         @default(0)
+  storageLimit  BigInt         @default(1073741824)
   files         File[]
   refreshTokens RefreshToken[]
   createdAt     DateTime       @default(now())

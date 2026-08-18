@@ -25,6 +25,20 @@ const hashToken = (token: string): string =>
 const generateRefreshToken = (): string =>
   crypto.randomBytes(48).toString("base64url");
 
+const toAuthUser = (user: {
+  id: string;
+  email: string;
+  storageUsed: bigint;
+  storageLimit: bigint;
+  createdAt: Date;
+}): AuthUser => ({
+  id: user.id,
+  email: user.email,
+  storageUsed: Number(user.storageUsed),
+  storageLimit: Number(user.storageLimit),
+  createdAt: user.createdAt,
+});
+
 const createRefreshTokenRecord = async (
   userId: string,
   familyId: string,
@@ -57,8 +71,18 @@ export const registerUser = async (
   );
 
   const user = await prisma.user.create({
-    data: { email, password: hashedPassword },
-    select: { id: true, email: true, createdAt: true },
+    data: {
+      email,
+      password: hashedPassword,
+      storageLimit: BigInt(env.DEFAULT_STORAGE_LIMIT_BYTES),
+    },
+    select: {
+      id: true,
+      email: true,
+      storageUsed: true,
+      storageLimit: true,
+      createdAt: true,
+    },
   });
 
   const refreshToken = await createRefreshTokenRecord(
@@ -69,14 +93,24 @@ export const registerUser = async (
   return {
     token: signAccessToken({ id: user.id, email: user.email }),
     refreshToken,
-    user,
+    user: toAuthUser(user),
   };
 };
 
 export const loginUser = async (input: LoginUserInput): Promise<AuthResult> => {
   const email = normalizeEmail(input.email);
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      password: true,
+      storageUsed: true,
+      storageLimit: true,
+      createdAt: true,
+    },
+  });
   if (!user) {
     throw new ApiError(401, "Invalid email or password");
   }
@@ -94,25 +128,27 @@ export const loginUser = async (input: LoginUserInput): Promise<AuthResult> => {
   return {
     token: signAccessToken({ id: user.id, email: user.email }),
     refreshToken,
-    user: {
-      id: user.id,
-      email: user.email,
-      createdAt: user.createdAt,
-    },
+    user: toAuthUser(user),
   };
 };
 
 export const getUserById = async (userId: string): Promise<AuthUser> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, email: true, createdAt: true },
+    select: {
+      id: true,
+      email: true,
+      storageUsed: true,
+      storageLimit: true,
+      createdAt: true,
+    },
   });
 
   if (!user) {
     throw new ApiError(404, "User not found");
   }
 
-  return user;
+  return toAuthUser(user);
 };
 
 const revokeFamily = async (familyId: string): Promise<void> => {

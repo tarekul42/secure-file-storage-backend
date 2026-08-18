@@ -24,10 +24,30 @@ import type {
 const sanitizeFileName = (fileName: string): string =>
   fileName.replace(/[\\/]+/g, "_").slice(0, FILE_LIMITS.MAX_FILENAME_LENGTH);
 
+const assertQuotaAvailable = async (
+  userId: string,
+  fileSize: number,
+): Promise<void> => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { storageUsed: true, storageLimit: true },
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (BigInt(fileSize) > user.storageLimit - user.storageUsed) {
+    throw new ApiError(413, "Storage quota exceeded");
+  }
+};
+
 export const requestUploadUrl = async (
   userId: string,
   input: RequestUploadInput,
 ): Promise<RequestUploadResult> => {
+  await assertQuotaAvailable(userId, input.fileSize);
+
   const safeFileName = sanitizeFileName(input.fileName);
   const s3Key = `${userId}/${crypto.randomUUID()}-${safeFileName}`;
 
@@ -56,14 +76,27 @@ export const createFileMetadata = async (
     );
   }
 
-  return prisma.file.create({
-    data: {
-      fileName: sanitizeFileName(input.fileName),
-      s3Key: input.s3Key,
-      fileSize: input.fileSize,
-      mimeType: input.mimeType,
-      ownerId: userId,
-    },
+  return prisma.$transaction(async (tx) => {
+    const reserved = await tx.$executeRaw`
+      UPDATE "User"
+      SET "storageUsed" = "storageUsed" + ${input.fileSize}
+      WHERE "id" = ${userId}
+        AND "storageUsed" + ${input.fileSize} <= "storageLimit"
+    `;
+
+    if (reserved === 0) {
+      throw new ApiError(413, "Storage quota exceeded");
+    }
+
+    return tx.file.create({
+      data: {
+        fileName: sanitizeFileName(input.fileName),
+        s3Key: input.s3Key,
+        fileSize: input.fileSize,
+        mimeType: input.mimeType,
+        ownerId: userId,
+      },
+    });
   });
 };
 
@@ -113,7 +146,14 @@ export const deleteFile = async (userId: string, fileId: string) => {
     );
   }
 
-  await prisma.file.delete({ where: { id: file.id } });
+  await prisma.$transaction([
+    prisma.file.delete({ where: { id: file.id } }),
+    prisma.$executeRaw`
+      UPDATE "User"
+      SET "storageUsed" = GREATEST(0, "storageUsed" - ${file.fileSize})
+      WHERE "id" = ${userId}
+    `,
+  ]);
 };
 
 export const getDownloadUrl = async (

@@ -20,14 +20,28 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  storageUsed: number | null
+  storageLimit: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  storageUsed: bigint | null
+  storageLimit: bigint | null
 }
 
 export type UserMinAggregateOutputType = {
   id: string | null
   email: string | null
   password: string | null
+  storageUsed: bigint | null
+  storageLimit: bigint | null
   createdAt: Date | null
 }
 
@@ -35,6 +49,8 @@ export type UserMaxAggregateOutputType = {
   id: string | null
   email: string | null
   password: string | null
+  storageUsed: bigint | null
+  storageLimit: bigint | null
   createdAt: Date | null
 }
 
@@ -42,15 +58,29 @@ export type UserCountAggregateOutputType = {
   id: number
   email: number
   password: number
+  storageUsed: number
+  storageLimit: number
   createdAt: number
   _all: number
 }
 
 
+export type UserAvgAggregateInputType = {
+  storageUsed?: true
+  storageLimit?: true
+}
+
+export type UserSumAggregateInputType = {
+  storageUsed?: true
+  storageLimit?: true
+}
+
 export type UserMinAggregateInputType = {
   id?: true
   email?: true
   password?: true
+  storageUsed?: true
+  storageLimit?: true
   createdAt?: true
 }
 
@@ -58,6 +88,8 @@ export type UserMaxAggregateInputType = {
   id?: true
   email?: true
   password?: true
+  storageUsed?: true
+  storageLimit?: true
   createdAt?: true
 }
 
@@ -65,6 +97,8 @@ export type UserCountAggregateInputType = {
   id?: true
   email?: true
   password?: true
+  storageUsed?: true
+  storageLimit?: true
   createdAt?: true
   _all?: true
 }
@@ -107,6 +141,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -137,6 +183,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -145,8 +193,12 @@ export type UserGroupByOutputType = {
   id: string
   email: string
   password: string
+  storageUsed: bigint
+  storageLimit: bigint
   createdAt: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -173,6 +225,8 @@ export type UserWhereInput = {
   id?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringFilter<"User"> | string
+  storageUsed?: Prisma.BigIntFilter<"User"> | bigint | number
+  storageLimit?: Prisma.BigIntFilter<"User"> | bigint | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   files?: Prisma.FileListRelationFilter
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
@@ -182,6 +236,8 @@ export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  storageUsed?: Prisma.SortOrder
+  storageLimit?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   files?: Prisma.FileOrderByRelationAggregateInput
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
@@ -194,6 +250,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   password?: Prisma.StringFilter<"User"> | string
+  storageUsed?: Prisma.BigIntFilter<"User"> | bigint | number
+  storageLimit?: Prisma.BigIntFilter<"User"> | bigint | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   files?: Prisma.FileListRelationFilter
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
@@ -203,10 +261,14 @@ export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  storageUsed?: Prisma.SortOrder
+  storageLimit?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -216,6 +278,8 @@ export type UserScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
+  storageUsed?: Prisma.BigIntWithAggregatesFilter<"User"> | bigint | number
+  storageLimit?: Prisma.BigIntWithAggregatesFilter<"User"> | bigint | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
 
@@ -223,6 +287,8 @@ export type UserCreateInput = {
   id?: string
   email: string
   password: string
+  storageUsed?: bigint | number
+  storageLimit?: bigint | number
   createdAt?: Date | string
   files?: Prisma.FileCreateNestedManyWithoutOwnerInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
@@ -232,6 +298,8 @@ export type UserUncheckedCreateInput = {
   id?: string
   email: string
   password: string
+  storageUsed?: bigint | number
+  storageLimit?: bigint | number
   createdAt?: Date | string
   files?: Prisma.FileUncheckedCreateNestedManyWithoutOwnerInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -241,6 +309,8 @@ export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.FileUpdateManyWithoutOwnerNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
@@ -250,6 +320,8 @@ export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.FileUncheckedUpdateManyWithoutOwnerNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -259,6 +331,8 @@ export type UserCreateManyInput = {
   id?: string
   email: string
   password: string
+  storageUsed?: bigint | number
+  storageLimit?: bigint | number
   createdAt?: Date | string
 }
 
@@ -266,6 +340,8 @@ export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -273,6 +349,8 @@ export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -280,13 +358,22 @@ export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  storageUsed?: Prisma.SortOrder
+  storageLimit?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  storageUsed?: Prisma.SortOrder
+  storageLimit?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  storageUsed?: Prisma.SortOrder
+  storageLimit?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -294,7 +381,14 @@ export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  storageUsed?: Prisma.SortOrder
+  storageLimit?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  storageUsed?: Prisma.SortOrder
+  storageLimit?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -304,6 +398,14 @@ export type UserScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type BigIntFieldUpdateOperationsInput = {
+  set?: bigint | number
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -342,6 +444,8 @@ export type UserCreateWithoutRefreshTokensInput = {
   id?: string
   email: string
   password: string
+  storageUsed?: bigint | number
+  storageLimit?: bigint | number
   createdAt?: Date | string
   files?: Prisma.FileCreateNestedManyWithoutOwnerInput
 }
@@ -350,6 +454,8 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   id?: string
   email: string
   password: string
+  storageUsed?: bigint | number
+  storageLimit?: bigint | number
   createdAt?: Date | string
   files?: Prisma.FileUncheckedCreateNestedManyWithoutOwnerInput
 }
@@ -374,6 +480,8 @@ export type UserUpdateWithoutRefreshTokensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.FileUpdateManyWithoutOwnerNestedInput
 }
@@ -382,6 +490,8 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.FileUncheckedUpdateManyWithoutOwnerNestedInput
 }
@@ -390,6 +500,8 @@ export type UserCreateWithoutFilesInput = {
   id?: string
   email: string
   password: string
+  storageUsed?: bigint | number
+  storageLimit?: bigint | number
   createdAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
 }
@@ -398,6 +510,8 @@ export type UserUncheckedCreateWithoutFilesInput = {
   id?: string
   email: string
   password: string
+  storageUsed?: bigint | number
+  storageLimit?: bigint | number
   createdAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
@@ -422,6 +536,8 @@ export type UserUpdateWithoutFilesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
 }
@@ -430,6 +546,8 @@ export type UserUncheckedUpdateWithoutFilesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsed?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -478,6 +596,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   email?: boolean
   password?: boolean
+  storageUsed?: boolean
+  storageLimit?: boolean
   createdAt?: boolean
   files?: boolean | Prisma.User$filesArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
@@ -488,6 +608,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   email?: boolean
   password?: boolean
+  storageUsed?: boolean
+  storageLimit?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -495,6 +617,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   email?: boolean
   password?: boolean
+  storageUsed?: boolean
+  storageLimit?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -502,10 +626,12 @@ export type UserSelectScalar = {
   id?: boolean
   email?: boolean
   password?: boolean
+  storageUsed?: boolean
+  storageLimit?: boolean
   createdAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "storageUsed" | "storageLimit" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   files?: boolean | Prisma.User$filesArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
@@ -524,6 +650,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     email: string
     password: string
+    storageUsed: bigint
+    storageLimit: bigint
     createdAt: Date
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -953,6 +1081,8 @@ export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly password: Prisma.FieldRef<"User", 'String'>
+  readonly storageUsed: Prisma.FieldRef<"User", 'BigInt'>
+  readonly storageLimit: Prisma.FieldRef<"User", 'BigInt'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     

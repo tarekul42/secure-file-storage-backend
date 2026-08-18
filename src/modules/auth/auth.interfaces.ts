@@ -16,6 +16,8 @@ export interface LoginUserInput {
 export interface AuthUser {
   id: string;
   email: string;
+  storageUsed: number;
+  storageLimit: number;
   createdAt: Date;
 }
 

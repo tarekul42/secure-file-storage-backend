@@ -29,6 +29,11 @@ const envSchema = z.object({
     .pipe(z.enum(["true", "false"]))
     .transform((value) => value === "true"),
   FRONTEND_ORIGIN: z.string().default("http://localhost:3000"),
+  DEFAULT_STORAGE_LIMIT_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(1073741824),
 });
 
 const parsed = envSchema.safeParse(process.env);
