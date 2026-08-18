@@ -29,6 +29,18 @@ const parsePart = <T extends object>(
   };
 };
 
+// Express 5 defines `req.query` as a getter-only property that re-parses the raw
+// query on every read, so it cannot be reassigned. Redefine it with a plain value
+// so the normalized/coerced data survives for the rest of the request lifecycle.
+const replaceQuery = (req: Request, data: object): void => {
+  Object.defineProperty(req, "query", {
+    value: data,
+    configurable: true,
+    enumerable: true,
+    writable: true,
+  });
+};
+
 export const validate =
   (parts: ValidationParts) =>
   (req: Request, res: Response, next: NextFunction): void => {
@@ -43,7 +55,7 @@ export const validate =
     if (parts.query) {
       const { data, issues } = parsePart(parts.query, req.query);
       if (issues) errors.push(...issues);
-      else req.query = data as Request["query"];
+      else replaceQuery(req, data as object);
     }
 
     if (parts.params) {

@@ -44,6 +44,21 @@ export const fileIdParamsSchema = {
   }),
 };
 
+export const listFilesQuerySchema = {
+  query: z.object({
+    cursor: z.string().uuid("A valid cursor is required").optional(),
+    limit: z.coerce
+      .number("limit must be a number")
+      .int("limit must be an integer")
+      .min(1, "limit must be at least 1")
+      .max(
+        FILE_LIMITS.MAX_LIST_LIMIT,
+        `limit must be at most ${FILE_LIMITS.MAX_LIST_LIMIT}`,
+      )
+      .optional(),
+  }),
+};
+
 export const updateVisibilitySchema = {
   params: fileIdParamsSchema.params,
   body: z.object({

@@ -13,6 +13,7 @@ import {
 import {
   createFileMetadataSchema,
   fileIdParamsSchema,
+  listFilesQuerySchema,
   requestUploadSchema,
   updateVisibilitySchema,
 } from "./file.validation.js";
@@ -33,7 +34,7 @@ router.post(
   createMetadata,
 );
 
-router.get("/", authenticate, listFiles);
+router.get("/", authenticate, validate(listFilesQuerySchema), listFiles);
 
 router.patch(
   "/:id",

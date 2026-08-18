@@ -40,3 +40,24 @@ export interface GetDownloadUrlInput {
   fileId: string;
   userId?: string;
 }
+
+export interface ListFilesParams {
+  cursor?: string;
+  limit?: number;
+}
+
+export interface ListFilesResult {
+  files: FileItem[];
+  nextCursor?: string | null;
+}
+
+export interface FileItem {
+  id: string;
+  fileName: string;
+  s3Key: string;
+  fileSize: number;
+  mimeType: string;
+  visibility: Visibility;
+  ownerId: string;
+  createdAt: Date;
+}

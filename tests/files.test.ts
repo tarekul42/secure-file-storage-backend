@@ -166,7 +166,8 @@ describe("Files API", () => {
         .set("Authorization", `Bearer ${tokenB}`);
 
       expect(res.status).toBe(200);
-      expect(res.body).toHaveLength(0);
+      expect(res.body.files).toHaveLength(0);
+      expect(res.body.nextCursor).toBeNull();
     });
   });
 

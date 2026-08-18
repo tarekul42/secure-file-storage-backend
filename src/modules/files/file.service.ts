@@ -16,6 +16,8 @@ import type {
   DownloadPublicInput,
   DownloadResult,
   GetDownloadUrlInput,
+  ListFilesParams,
+  ListFilesResult,
   RequestUploadInput,
   RequestUploadResult,
   Visibility,
@@ -100,11 +102,29 @@ export const createFileMetadata = async (
   });
 };
 
-export const listUserFiles = async (userId: string) =>
-  prisma.file.findMany({
+export const listUserFiles = async (
+  userId: string,
+  params: ListFilesParams,
+): Promise<ListFilesResult> => {
+  const limit = Math.min(
+    params.limit ?? FILE_LIMITS.DEFAULT_LIST_LIMIT,
+    FILE_LIMITS.MAX_LIST_LIMIT,
+  );
+  const take = limit + 1;
+
+  const files = await prisma.file.findMany({
     where: { ownerId: userId },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take,
+    ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
   });
+
+  const hasMore = files.length > limit;
+  const page = hasMore ? files.slice(0, limit) : files;
+  const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
+
+  return { files: page, nextCursor };
+};
 
 const getOwnedFile = async (userId: string, fileId: string) => {
   const file = await prisma.file.findUnique({ where: { id: fileId } });

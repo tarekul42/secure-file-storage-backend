@@ -33,8 +33,15 @@ export const createMetadata = asyncHandler(
 
 export const listFiles = asyncHandler(
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    const files = await listUserFiles(userIdOf(req));
-    res.json(files);
+    const result = await listUserFiles(userIdOf(req), {
+      ...(req.query.cursor !== undefined
+        ? { cursor: req.query.cursor as string }
+        : {}),
+      ...(req.query.limit !== undefined
+        ? { limit: Number(req.query.limit) }
+        : {}),
+    });
+    res.json(result);
   },
 );
 
