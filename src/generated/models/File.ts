@@ -40,6 +40,8 @@ export type FileMinAggregateOutputType = {
   s3Key: string | null
   fileSize: number | null
   mimeType: string | null
+  etag: string | null
+  checksum: string | null
   visibility: $Enums.Visibility | null
   ownerId: string | null
   createdAt: Date | null
@@ -51,6 +53,8 @@ export type FileMaxAggregateOutputType = {
   s3Key: string | null
   fileSize: number | null
   mimeType: string | null
+  etag: string | null
+  checksum: string | null
   visibility: $Enums.Visibility | null
   ownerId: string | null
   createdAt: Date | null
@@ -62,6 +66,8 @@ export type FileCountAggregateOutputType = {
   s3Key: number
   fileSize: number
   mimeType: number
+  etag: number
+  checksum: number
   visibility: number
   ownerId: number
   createdAt: number
@@ -83,6 +89,8 @@ export type FileMinAggregateInputType = {
   s3Key?: true
   fileSize?: true
   mimeType?: true
+  etag?: true
+  checksum?: true
   visibility?: true
   ownerId?: true
   createdAt?: true
@@ -94,6 +102,8 @@ export type FileMaxAggregateInputType = {
   s3Key?: true
   fileSize?: true
   mimeType?: true
+  etag?: true
+  checksum?: true
   visibility?: true
   ownerId?: true
   createdAt?: true
@@ -105,6 +115,8 @@ export type FileCountAggregateInputType = {
   s3Key?: true
   fileSize?: true
   mimeType?: true
+  etag?: true
+  checksum?: true
   visibility?: true
   ownerId?: true
   createdAt?: true
@@ -203,6 +215,8 @@ export type FileGroupByOutputType = {
   s3Key: string
   fileSize: number
   mimeType: string
+  etag: string | null
+  checksum: string | null
   visibility: $Enums.Visibility
   ownerId: string
   createdAt: Date
@@ -237,6 +251,8 @@ export type FileWhereInput = {
   s3Key?: Prisma.StringFilter<"File"> | string
   fileSize?: Prisma.IntFilter<"File"> | number
   mimeType?: Prisma.StringFilter<"File"> | string
+  etag?: Prisma.StringNullableFilter<"File"> | string | null
+  checksum?: Prisma.StringNullableFilter<"File"> | string | null
   visibility?: Prisma.EnumVisibilityFilter<"File"> | $Enums.Visibility
   ownerId?: Prisma.StringFilter<"File"> | string
   createdAt?: Prisma.DateTimeFilter<"File"> | Date | string
@@ -249,6 +265,8 @@ export type FileOrderByWithRelationInput = {
   s3Key?: Prisma.SortOrder
   fileSize?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
+  etag?: Prisma.SortOrderInput | Prisma.SortOrder
+  checksum?: Prisma.SortOrderInput | Prisma.SortOrder
   visibility?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -264,6 +282,8 @@ export type FileWhereUniqueInput = Prisma.AtLeast<{
   s3Key?: Prisma.StringFilter<"File"> | string
   fileSize?: Prisma.IntFilter<"File"> | number
   mimeType?: Prisma.StringFilter<"File"> | string
+  etag?: Prisma.StringNullableFilter<"File"> | string | null
+  checksum?: Prisma.StringNullableFilter<"File"> | string | null
   visibility?: Prisma.EnumVisibilityFilter<"File"> | $Enums.Visibility
   ownerId?: Prisma.StringFilter<"File"> | string
   createdAt?: Prisma.DateTimeFilter<"File"> | Date | string
@@ -276,6 +296,8 @@ export type FileOrderByWithAggregationInput = {
   s3Key?: Prisma.SortOrder
   fileSize?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
+  etag?: Prisma.SortOrderInput | Prisma.SortOrder
+  checksum?: Prisma.SortOrderInput | Prisma.SortOrder
   visibility?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -295,6 +317,8 @@ export type FileScalarWhereWithAggregatesInput = {
   s3Key?: Prisma.StringWithAggregatesFilter<"File"> | string
   fileSize?: Prisma.IntWithAggregatesFilter<"File"> | number
   mimeType?: Prisma.StringWithAggregatesFilter<"File"> | string
+  etag?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
+  checksum?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
   visibility?: Prisma.EnumVisibilityWithAggregatesFilter<"File"> | $Enums.Visibility
   ownerId?: Prisma.StringWithAggregatesFilter<"File"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"File"> | Date | string
@@ -306,6 +330,8 @@ export type FileCreateInput = {
   s3Key: string
   fileSize: number
   mimeType: string
+  etag?: string | null
+  checksum?: string | null
   visibility?: $Enums.Visibility
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutFilesInput
@@ -317,6 +343,8 @@ export type FileUncheckedCreateInput = {
   s3Key: string
   fileSize: number
   mimeType: string
+  etag?: string | null
+  checksum?: string | null
   visibility?: $Enums.Visibility
   ownerId: string
   createdAt?: Date | string
@@ -328,6 +356,8 @@ export type FileUpdateInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.IntFieldUpdateOperationsInput | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutFilesNestedInput
@@ -339,6 +369,8 @@ export type FileUncheckedUpdateInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.IntFieldUpdateOperationsInput | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -350,6 +382,8 @@ export type FileCreateManyInput = {
   s3Key: string
   fileSize: number
   mimeType: string
+  etag?: string | null
+  checksum?: string | null
   visibility?: $Enums.Visibility
   ownerId: string
   createdAt?: Date | string
@@ -361,6 +395,8 @@ export type FileUpdateManyMutationInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.IntFieldUpdateOperationsInput | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -371,6 +407,8 @@ export type FileUncheckedUpdateManyInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.IntFieldUpdateOperationsInput | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -392,6 +430,8 @@ export type FileCountOrderByAggregateInput = {
   s3Key?: Prisma.SortOrder
   fileSize?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
+  etag?: Prisma.SortOrder
+  checksum?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -407,6 +447,8 @@ export type FileMaxOrderByAggregateInput = {
   s3Key?: Prisma.SortOrder
   fileSize?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
+  etag?: Prisma.SortOrder
+  checksum?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -418,6 +460,8 @@ export type FileMinOrderByAggregateInput = {
   s3Key?: Prisma.SortOrder
   fileSize?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
+  etag?: Prisma.SortOrder
+  checksum?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -487,6 +531,8 @@ export type FileCreateWithoutOwnerInput = {
   s3Key: string
   fileSize: number
   mimeType: string
+  etag?: string | null
+  checksum?: string | null
   visibility?: $Enums.Visibility
   createdAt?: Date | string
 }
@@ -497,6 +543,8 @@ export type FileUncheckedCreateWithoutOwnerInput = {
   s3Key: string
   fileSize: number
   mimeType: string
+  etag?: string | null
+  checksum?: string | null
   visibility?: $Enums.Visibility
   createdAt?: Date | string
 }
@@ -536,6 +584,8 @@ export type FileScalarWhereInput = {
   s3Key?: Prisma.StringFilter<"File"> | string
   fileSize?: Prisma.IntFilter<"File"> | number
   mimeType?: Prisma.StringFilter<"File"> | string
+  etag?: Prisma.StringNullableFilter<"File"> | string | null
+  checksum?: Prisma.StringNullableFilter<"File"> | string | null
   visibility?: Prisma.EnumVisibilityFilter<"File"> | $Enums.Visibility
   ownerId?: Prisma.StringFilter<"File"> | string
   createdAt?: Prisma.DateTimeFilter<"File"> | Date | string
@@ -547,6 +597,8 @@ export type FileCreateManyOwnerInput = {
   s3Key: string
   fileSize: number
   mimeType: string
+  etag?: string | null
+  checksum?: string | null
   visibility?: $Enums.Visibility
   createdAt?: Date | string
 }
@@ -557,6 +609,8 @@ export type FileUpdateWithoutOwnerInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.IntFieldUpdateOperationsInput | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -567,6 +621,8 @@ export type FileUncheckedUpdateWithoutOwnerInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.IntFieldUpdateOperationsInput | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -577,6 +633,8 @@ export type FileUncheckedUpdateManyWithoutOwnerInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileSize?: Prisma.IntFieldUpdateOperationsInput | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -589,6 +647,8 @@ export type FileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   s3Key?: boolean
   fileSize?: boolean
   mimeType?: boolean
+  etag?: boolean
+  checksum?: boolean
   visibility?: boolean
   ownerId?: boolean
   createdAt?: boolean
@@ -601,6 +661,8 @@ export type FileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   s3Key?: boolean
   fileSize?: boolean
   mimeType?: boolean
+  etag?: boolean
+  checksum?: boolean
   visibility?: boolean
   ownerId?: boolean
   createdAt?: boolean
@@ -613,6 +675,8 @@ export type FileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   s3Key?: boolean
   fileSize?: boolean
   mimeType?: boolean
+  etag?: boolean
+  checksum?: boolean
   visibility?: boolean
   ownerId?: boolean
   createdAt?: boolean
@@ -625,12 +689,14 @@ export type FileSelectScalar = {
   s3Key?: boolean
   fileSize?: boolean
   mimeType?: boolean
+  etag?: boolean
+  checksum?: boolean
   visibility?: boolean
   ownerId?: boolean
   createdAt?: boolean
 }
 
-export type FileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fileName" | "s3Key" | "fileSize" | "mimeType" | "visibility" | "ownerId" | "createdAt", ExtArgs["result"]["file"]>
+export type FileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fileName" | "s3Key" | "fileSize" | "mimeType" | "etag" | "checksum" | "visibility" | "ownerId" | "createdAt", ExtArgs["result"]["file"]>
 export type FileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -652,6 +718,8 @@ export type $FilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     s3Key: string
     fileSize: number
     mimeType: string
+    etag: string | null
+    checksum: string | null
     visibility: $Enums.Visibility
     ownerId: string
     createdAt: Date
@@ -1084,6 +1152,8 @@ export interface FileFieldRefs {
   readonly s3Key: Prisma.FieldRef<"File", 'String'>
   readonly fileSize: Prisma.FieldRef<"File", 'Int'>
   readonly mimeType: Prisma.FieldRef<"File", 'String'>
+  readonly etag: Prisma.FieldRef<"File", 'String'>
+  readonly checksum: Prisma.FieldRef<"File", 'String'>
   readonly visibility: Prisma.FieldRef<"File", 'Visibility'>
   readonly ownerId: Prisma.FieldRef<"File", 'String'>
   readonly createdAt: Prisma.FieldRef<"File", 'DateTime'>

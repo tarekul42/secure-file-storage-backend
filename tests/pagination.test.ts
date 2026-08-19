@@ -9,19 +9,36 @@ import {
   vi,
 } from "vitest";
 
+const s3State = vi.hoisted(() => ({
+  headSize: 10,
+  etag: "test-etag",
+}));
+
 vi.mock("@aws-sdk/client-s3", () => {
   class MockS3Client {
-    async send(): Promise<unknown> {
+    async send(command: { constructor: { name: string } }): Promise<unknown> {
+      if (command.constructor.name === "HeadObjectCommand") {
+        return {
+          $metadata: {},
+          ContentLength: s3State.headSize,
+          ETag: `"${s3State.etag}"`,
+        };
+      }
       return { $metadata: {} };
     }
   }
-  class Command {}
+  class PutObjectCommand {}
+  class GetObjectCommand {}
+  class DeleteObjectCommand {}
+  class HeadObjectCommand {}
+  class ListObjectsV2Command {}
   return {
     S3Client: MockS3Client,
-    PutObjectCommand: Command,
-    GetObjectCommand: Command,
-    DeleteObjectCommand: Command,
-    ListObjectsV2Command: Command,
+    PutObjectCommand,
+    GetObjectCommand,
+    DeleteObjectCommand,
+    HeadObjectCommand,
+    ListObjectsV2Command,
   };
 });
 

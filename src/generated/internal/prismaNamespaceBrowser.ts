@@ -104,6 +104,8 @@ export const FileScalarFieldEnum = {
   s3Key: 's3Key',
   fileSize: 'fileSize',
   mimeType: 'mimeType',
+  etag: 'etag',
+  checksum: 'checksum',
   visibility: 'visibility',
   ownerId: 'ownerId',
   createdAt: 'createdAt'

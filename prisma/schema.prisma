@@ -36,13 +36,15 @@ model RefreshToken {
 }
 
 model File {
-  id          String      @id @default(uuid())
-  fileName    String
-  s3Key       String
-  fileSize    Int
-  mimeType    String
-  visibility  Visibility  @default(PRIVATE)
-  ownerId     String
-  owner       User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  createdAt   DateTime    @default(now())
+  id         String      @id @default(uuid())
+  fileName   String
+  s3Key      String
+  fileSize   Int
+  mimeType   String
+  etag       String?
+  checksum   String?
+  visibility Visibility  @default(PRIVATE)
+  ownerId    String
+  owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime    @default(now())
 }

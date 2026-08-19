@@ -1,6 +1,7 @@
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadObjectCommand,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -78,6 +79,38 @@ export const createFileMetadata = async (
     );
   }
 
+  let head;
+  try {
+    head = await s3.send(
+      new HeadObjectCommand({
+        Bucket: env.AWS_S3_BUCKET_NAME,
+        Key: input.s3Key,
+      }),
+    );
+  } catch (error) {
+    if (
+      (error as { name?: string }).name === "NotFound" ||
+      (error as { $metadata?: { httpStatusCode?: number } })?.$metadata
+        ?.httpStatusCode === 404
+    ) {
+      throw new ApiError(
+        400,
+        "Object not found in storage: upload the file before registering metadata",
+      );
+    }
+    throw error;
+  }
+
+  const actualSize = Number(head.ContentLength ?? 0);
+  if (actualSize !== input.fileSize) {
+    throw new ApiError(
+      400,
+      "Size mismatch: uploaded object size does not match the registered size",
+    );
+  }
+
+  const etag = head.ETag?.replace(/^"(.*)"$/, "$1") ?? null;
+
   return prisma.$transaction(async (tx) => {
     const reserved = await tx.$executeRaw`
       UPDATE "User"
@@ -96,6 +129,8 @@ export const createFileMetadata = async (
         s3Key: input.s3Key,
         fileSize: input.fileSize,
         mimeType: input.mimeType,
+        etag,
+        checksum: etag,
         ownerId: userId,
       },
     });

@@ -10,18 +10,34 @@ import {
   vi,
 } from "vitest";
 
+const s3State = vi.hoisted(() => ({
+  headSize: 10,
+  etag: "test-etag",
+}));
+
 vi.mock("@aws-sdk/client-s3", () => {
   class MockS3Client {
-    async send(): Promise<unknown> {
+    async send(command: { constructor: { name: string } }): Promise<unknown> {
+      if (command.constructor.name === "HeadObjectCommand") {
+        return {
+          $metadata: {},
+          ContentLength: s3State.headSize,
+          ETag: `"${s3State.etag}"`,
+        };
+      }
       return { $metadata: {} };
     }
   }
-  class Command {}
+  class PutObjectCommand {}
+  class GetObjectCommand {}
+  class DeleteObjectCommand {}
+  class HeadObjectCommand {}
   return {
     S3Client: MockS3Client,
-    PutObjectCommand: Command,
-    GetObjectCommand: Command,
-    DeleteObjectCommand: Command,
+    PutObjectCommand,
+    GetObjectCommand,
+    DeleteObjectCommand,
+    HeadObjectCommand,
   };
 });
 
@@ -52,6 +68,7 @@ describe("Files API", () => {
 
   beforeEach(async () => {
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "User" CASCADE');
+    s3State.headSize = 10;
   });
 
   describe("POST /api/files/upload-url", () => {
@@ -108,6 +125,7 @@ describe("Files API", () => {
         .send({ fileName: "photo.png", fileType: "image/png", fileSize: 5000 });
       const s3Key = keyRes.body.s3Key as string;
 
+      s3State.headSize = 5000;
       const res = await request(app)
         .post("/api/files")
         .set("Authorization", `Bearer ${token}`)
@@ -205,6 +223,7 @@ describe("Files API", () => {
         .post("/api/files/upload-url")
         .set("Authorization", `Bearer ${tokenOwner}`)
         .send({ fileName: "a.txt", fileType: "text/plain", fileSize: 10 });
+
       const created = await request(app)
         .post("/api/files")
         .set("Authorization", `Bearer ${tokenOwner}`)

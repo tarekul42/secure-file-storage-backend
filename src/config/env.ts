@@ -34,6 +34,11 @@ const envSchema = z.object({
     .int()
     .positive()
     .default(1073741824),
+  ALLOWED_CONTENT_TYPES: z
+    .string()
+    .default(
+      "application/octet-stream,application/json,application/pdf,application/zip,application/gzip,application/x-tar,image/png,image/jpeg,image/gif,image/webp,image/svg+xml,text/plain,text/csv,text/markdown,audio/mpeg,video/mp4",
+    ),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -49,3 +54,9 @@ export const env = parsed.data;
 export const allowedOrigins = env.FRONTEND_ORIGIN.split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+
+export const allowedContentTypes = new Set(
+  env.ALLOWED_CONTENT_TYPES.split(",")
+    .map((type) => type.trim().toLowerCase())
+    .filter(Boolean),
+);

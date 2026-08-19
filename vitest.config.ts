@@ -21,6 +21,8 @@ export default defineConfig({
       AWS_ACCESS_KEY_ID: "minioadmin",
       AWS_SECRET_ACCESS_KEY: "minioadmin",
       FRONTEND_ORIGIN: "http://localhost:3000",
+      ALLOWED_CONTENT_TYPES:
+        "application/octet-stream,text/plain,image/png,application/json,application/pdf",
     },
     include: ["tests/**/*.test.ts"],
   },

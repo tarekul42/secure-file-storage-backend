@@ -9,18 +9,34 @@ import {
   vi,
 } from "vitest";
 
+const s3State = vi.hoisted(() => ({
+  headSize: 10,
+  etag: "test-etag",
+}));
+
 vi.mock("@aws-sdk/client-s3", () => {
   class MockS3Client {
-    async send(): Promise<unknown> {
+    async send(command: { constructor: { name: string } }): Promise<unknown> {
+      if (command.constructor.name === "HeadObjectCommand") {
+        return {
+          $metadata: {},
+          ContentLength: s3State.headSize,
+          ETag: `"${s3State.etag}"`,
+        };
+      }
       return { $metadata: {} };
     }
   }
-  class Command {}
+  class PutObjectCommand {}
+  class GetObjectCommand {}
+  class DeleteObjectCommand {}
+  class HeadObjectCommand {}
   return {
     S3Client: MockS3Client,
-    PutObjectCommand: Command,
-    GetObjectCommand: Command,
-    DeleteObjectCommand: Command,
+    PutObjectCommand,
+    GetObjectCommand,
+    DeleteObjectCommand,
+    HeadObjectCommand,
   };
 });
 
@@ -107,6 +123,7 @@ describe("Storage quota enforcement", () => {
       });
     const s3Key = keyRes.body.s3Key as string;
 
+    s3State.headSize = 60;
     const first = await request(app)
       .post("/api/files")
       .set("Authorization", `Bearer ${token}`)
@@ -124,6 +141,7 @@ describe("Storage quota enforcement", () => {
     });
     const secondKey = `${user?.id}/second-file.bin`;
 
+    s3State.headSize = 50;
     const second = await request(app)
       .post("/api/files")
       .set("Authorization", `Bearer ${token}`)
@@ -151,6 +169,7 @@ describe("Storage quota enforcement", () => {
       });
     const s3Key = keyRes.body.s3Key as string;
 
+    s3State.headSize = 60;
     const created = await request(app)
       .post("/api/files")
       .set("Authorization", `Bearer ${token}`)

@@ -1,5 +1,11 @@
 import { z } from "zod";
+import { allowedContentTypes } from "../../config/env.js";
 import { FILE_LIMITS } from "./file.constants.js";
+
+const isAllowedContentType = (value: string): boolean =>
+  allowedContentTypes.has(value.toLowerCase());
+
+const NOT_ALLOWED_MESSAGE = "is not in the allowed content-type list";
 
 export const requestUploadSchema = {
   body: z.object({
@@ -12,7 +18,8 @@ export const requestUploadSchema = {
       .string()
       .trim()
       .min(1, "fileType is required")
-      .max(255, "fileType is too long"),
+      .max(255, "fileType is too long")
+      .refine(isAllowedContentType, `fileType ${NOT_ALLOWED_MESSAGE}`),
     fileSize: z
       .number()
       .int("fileSize must be an integer")
@@ -34,7 +41,12 @@ export const createFileMetadataSchema = {
       .int("fileSize must be an integer")
       .nonnegative("fileSize must be non-negative")
       .max(FILE_LIMITS.MAX_SIZE_BYTES, "File size exceeds the 100MB limit"),
-    mimeType: z.string().trim().min(1, "mimeType is required").max(255),
+    mimeType: z
+      .string()
+      .trim()
+      .min(1, "mimeType is required")
+      .max(255)
+      .refine(isAllowedContentType, `mimeType ${NOT_ALLOWED_MESSAGE}`),
   }),
 };
 
