@@ -43,8 +43,10 @@ export type FileMinAggregateOutputType = {
   etag: string | null
   checksum: string | null
   visibility: $Enums.Visibility | null
+  parentId: string | null
   ownerId: string | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type FileMaxAggregateOutputType = {
@@ -56,8 +58,10 @@ export type FileMaxAggregateOutputType = {
   etag: string | null
   checksum: string | null
   visibility: $Enums.Visibility | null
+  parentId: string | null
   ownerId: string | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type FileCountAggregateOutputType = {
@@ -69,8 +73,10 @@ export type FileCountAggregateOutputType = {
   etag: number
   checksum: number
   visibility: number
+  parentId: number
   ownerId: number
   createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -92,8 +98,10 @@ export type FileMinAggregateInputType = {
   etag?: true
   checksum?: true
   visibility?: true
+  parentId?: true
   ownerId?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type FileMaxAggregateInputType = {
@@ -105,8 +113,10 @@ export type FileMaxAggregateInputType = {
   etag?: true
   checksum?: true
   visibility?: true
+  parentId?: true
   ownerId?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type FileCountAggregateInputType = {
@@ -118,8 +128,10 @@ export type FileCountAggregateInputType = {
   etag?: true
   checksum?: true
   visibility?: true
+  parentId?: true
   ownerId?: true
   createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -218,8 +230,10 @@ export type FileGroupByOutputType = {
   etag: string | null
   checksum: string | null
   visibility: $Enums.Visibility
+  parentId: string | null
   ownerId: string
   createdAt: Date
+  updatedAt: Date
   _count: FileCountAggregateOutputType | null
   _avg: FileAvgAggregateOutputType | null
   _sum: FileSumAggregateOutputType | null
@@ -254,8 +268,10 @@ export type FileWhereInput = {
   etag?: Prisma.StringNullableFilter<"File"> | string | null
   checksum?: Prisma.StringNullableFilter<"File"> | string | null
   visibility?: Prisma.EnumVisibilityFilter<"File"> | $Enums.Visibility
+  parentId?: Prisma.StringNullableFilter<"File"> | string | null
   ownerId?: Prisma.StringFilter<"File"> | string
   createdAt?: Prisma.DateTimeFilter<"File"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"File"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -268,8 +284,10 @@ export type FileOrderByWithRelationInput = {
   etag?: Prisma.SortOrderInput | Prisma.SortOrder
   checksum?: Prisma.SortOrderInput | Prisma.SortOrder
   visibility?: Prisma.SortOrder
+  parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -285,8 +303,10 @@ export type FileWhereUniqueInput = Prisma.AtLeast<{
   etag?: Prisma.StringNullableFilter<"File"> | string | null
   checksum?: Prisma.StringNullableFilter<"File"> | string | null
   visibility?: Prisma.EnumVisibilityFilter<"File"> | $Enums.Visibility
+  parentId?: Prisma.StringNullableFilter<"File"> | string | null
   ownerId?: Prisma.StringFilter<"File"> | string
   createdAt?: Prisma.DateTimeFilter<"File"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"File"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -299,8 +319,10 @@ export type FileOrderByWithAggregationInput = {
   etag?: Prisma.SortOrderInput | Prisma.SortOrder
   checksum?: Prisma.SortOrderInput | Prisma.SortOrder
   visibility?: Prisma.SortOrder
+  parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.FileCountOrderByAggregateInput
   _avg?: Prisma.FileAvgOrderByAggregateInput
   _max?: Prisma.FileMaxOrderByAggregateInput
@@ -320,8 +342,10 @@ export type FileScalarWhereWithAggregatesInput = {
   etag?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
   checksum?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
   visibility?: Prisma.EnumVisibilityWithAggregatesFilter<"File"> | $Enums.Visibility
+  parentId?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
   ownerId?: Prisma.StringWithAggregatesFilter<"File"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"File"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"File"> | Date | string
 }
 
 export type FileCreateInput = {
@@ -333,7 +357,9 @@ export type FileCreateInput = {
   etag?: string | null
   checksum?: string | null
   visibility?: $Enums.Visibility
+  parentId?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutFilesInput
 }
 
@@ -346,8 +372,10 @@ export type FileUncheckedCreateInput = {
   etag?: string | null
   checksum?: string | null
   visibility?: $Enums.Visibility
+  parentId?: string | null
   ownerId: string
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type FileUpdateInput = {
@@ -359,7 +387,9 @@ export type FileUpdateInput = {
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutFilesNestedInput
 }
 
@@ -372,8 +402,10 @@ export type FileUncheckedUpdateInput = {
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FileCreateManyInput = {
@@ -385,8 +417,10 @@ export type FileCreateManyInput = {
   etag?: string | null
   checksum?: string | null
   visibility?: $Enums.Visibility
+  parentId?: string | null
   ownerId: string
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type FileUpdateManyMutationInput = {
@@ -398,7 +432,9 @@ export type FileUpdateManyMutationInput = {
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FileUncheckedUpdateManyInput = {
@@ -410,8 +446,10 @@ export type FileUncheckedUpdateManyInput = {
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FileListRelationFilter = {
@@ -433,8 +471,10 @@ export type FileCountOrderByAggregateInput = {
   etag?: Prisma.SortOrder
   checksum?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
+  parentId?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type FileAvgOrderByAggregateInput = {
@@ -450,8 +490,10 @@ export type FileMaxOrderByAggregateInput = {
   etag?: Prisma.SortOrder
   checksum?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
+  parentId?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type FileMinOrderByAggregateInput = {
@@ -463,8 +505,10 @@ export type FileMinOrderByAggregateInput = {
   etag?: Prisma.SortOrder
   checksum?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
+  parentId?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type FileSumOrderByAggregateInput = {
@@ -513,14 +557,6 @@ export type FileUncheckedUpdateManyWithoutOwnerNestedInput = {
   deleteMany?: Prisma.FileScalarWhereInput | Prisma.FileScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type EnumVisibilityFieldUpdateOperationsInput = {
   set?: $Enums.Visibility
 }
@@ -534,7 +570,9 @@ export type FileCreateWithoutOwnerInput = {
   etag?: string | null
   checksum?: string | null
   visibility?: $Enums.Visibility
+  parentId?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type FileUncheckedCreateWithoutOwnerInput = {
@@ -546,7 +584,9 @@ export type FileUncheckedCreateWithoutOwnerInput = {
   etag?: string | null
   checksum?: string | null
   visibility?: $Enums.Visibility
+  parentId?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type FileCreateOrConnectWithoutOwnerInput = {
@@ -587,8 +627,10 @@ export type FileScalarWhereInput = {
   etag?: Prisma.StringNullableFilter<"File"> | string | null
   checksum?: Prisma.StringNullableFilter<"File"> | string | null
   visibility?: Prisma.EnumVisibilityFilter<"File"> | $Enums.Visibility
+  parentId?: Prisma.StringNullableFilter<"File"> | string | null
   ownerId?: Prisma.StringFilter<"File"> | string
   createdAt?: Prisma.DateTimeFilter<"File"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"File"> | Date | string
 }
 
 export type FileCreateManyOwnerInput = {
@@ -600,7 +642,9 @@ export type FileCreateManyOwnerInput = {
   etag?: string | null
   checksum?: string | null
   visibility?: $Enums.Visibility
+  parentId?: string | null
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type FileUpdateWithoutOwnerInput = {
@@ -612,7 +656,9 @@ export type FileUpdateWithoutOwnerInput = {
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FileUncheckedUpdateWithoutOwnerInput = {
@@ -624,7 +670,9 @@ export type FileUncheckedUpdateWithoutOwnerInput = {
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FileUncheckedUpdateManyWithoutOwnerInput = {
@@ -636,7 +684,9 @@ export type FileUncheckedUpdateManyWithoutOwnerInput = {
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -650,8 +700,10 @@ export type FileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   etag?: boolean
   checksum?: boolean
   visibility?: boolean
+  parentId?: boolean
   ownerId?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["file"]>
 
@@ -664,8 +716,10 @@ export type FileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   etag?: boolean
   checksum?: boolean
   visibility?: boolean
+  parentId?: boolean
   ownerId?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["file"]>
 
@@ -678,8 +732,10 @@ export type FileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   etag?: boolean
   checksum?: boolean
   visibility?: boolean
+  parentId?: boolean
   ownerId?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["file"]>
 
@@ -692,11 +748,13 @@ export type FileSelectScalar = {
   etag?: boolean
   checksum?: boolean
   visibility?: boolean
+  parentId?: boolean
   ownerId?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type FileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fileName" | "s3Key" | "fileSize" | "mimeType" | "etag" | "checksum" | "visibility" | "ownerId" | "createdAt", ExtArgs["result"]["file"]>
+export type FileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fileName" | "s3Key" | "fileSize" | "mimeType" | "etag" | "checksum" | "visibility" | "parentId" | "ownerId" | "createdAt" | "updatedAt", ExtArgs["result"]["file"]>
 export type FileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -721,8 +779,10 @@ export type $FilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     etag: string | null
     checksum: string | null
     visibility: $Enums.Visibility
+    parentId: string | null
     ownerId: string
     createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["file"]>
   composites: {}
 }
@@ -1155,8 +1215,10 @@ export interface FileFieldRefs {
   readonly etag: Prisma.FieldRef<"File", 'String'>
   readonly checksum: Prisma.FieldRef<"File", 'String'>
   readonly visibility: Prisma.FieldRef<"File", 'Visibility'>
+  readonly parentId: Prisma.FieldRef<"File", 'String'>
   readonly ownerId: Prisma.FieldRef<"File", 'String'>
   readonly createdAt: Prisma.FieldRef<"File", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"File", 'DateTime'>
 }
     
 

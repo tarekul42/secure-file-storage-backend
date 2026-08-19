@@ -1,6 +1,7 @@
 export interface JwtPayload {
   id: string;
   email: string;
+  tokenVersion: number;
 }
 
 export interface RegisterUserInput {
@@ -16,6 +17,8 @@ export interface LoginUserInput {
 export interface AuthUser {
   id: string;
   email: string;
+  role: "USER" | "ADMIN";
+  isVerified: boolean;
   storageUsed: number;
   storageLimit: number;
   createdAt: Date;

@@ -110,4 +110,32 @@ describe("Refresh token flow", () => {
       .send({ refreshToken });
     expect(refresh.status).toBe(401);
   });
+
+  it("logout-all invalidates outstanding access tokens via tokenVersion", async () => {
+    const { accessToken } = await registerUser("refresh@example.com");
+
+    const before = await request(app)
+      .get("/api/auth/me")
+      .set("Authorization", `Bearer ${accessToken}`);
+    expect(before.status).toBe(200);
+
+    await request(app)
+      .post("/api/auth/logout-all")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const after = await request(app)
+      .get("/api/auth/me")
+      .set("Authorization", `Bearer ${accessToken}`);
+    expect(after.status).toBe(401);
+
+    const relogin = await request(app)
+      .post("/api/auth/login")
+      .send({ email: "refresh@example.com", password: "password123" });
+    expect(relogin.status).toBe(200);
+
+    const withNew = await request(app)
+      .get("/api/auth/me")
+      .set("Authorization", `Bearer ${relogin.body.token}`);
+    expect(withNew.status).toBe(200);
+  });
 });

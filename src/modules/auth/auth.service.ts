@@ -28,12 +28,16 @@ const generateRefreshToken = (): string =>
 const toAuthUser = (user: {
   id: string;
   email: string;
+  role: "USER" | "ADMIN";
+  isVerified: boolean;
   storageUsed: bigint;
   storageLimit: bigint;
   createdAt: Date;
 }): AuthUser => ({
   id: user.id,
   email: user.email,
+  role: user.role,
+  isVerified: user.isVerified,
   storageUsed: Number(user.storageUsed),
   storageLimit: Number(user.storageLimit),
   createdAt: user.createdAt,
@@ -79,6 +83,9 @@ export const registerUser = async (
     select: {
       id: true,
       email: true,
+      role: true,
+      isVerified: true,
+      tokenVersion: true,
       storageUsed: true,
       storageLimit: true,
       createdAt: true,
@@ -91,7 +98,11 @@ export const registerUser = async (
   );
 
   return {
-    token: signAccessToken({ id: user.id, email: user.email }),
+    token: signAccessToken({
+      id: user.id,
+      email: user.email,
+      tokenVersion: user.tokenVersion,
+    }),
     refreshToken,
     user: toAuthUser(user),
   };
@@ -106,6 +117,9 @@ export const loginUser = async (input: LoginUserInput): Promise<AuthResult> => {
       id: true,
       email: true,
       password: true,
+      role: true,
+      isVerified: true,
+      tokenVersion: true,
       storageUsed: true,
       storageLimit: true,
       createdAt: true,
@@ -126,7 +140,11 @@ export const loginUser = async (input: LoginUserInput): Promise<AuthResult> => {
   );
 
   return {
-    token: signAccessToken({ id: user.id, email: user.email }),
+    token: signAccessToken({
+      id: user.id,
+      email: user.email,
+      tokenVersion: user.tokenVersion,
+    }),
     refreshToken,
     user: toAuthUser(user),
   };
@@ -138,6 +156,8 @@ export const getUserById = async (userId: string): Promise<AuthUser> => {
     select: {
       id: true,
       email: true,
+      role: true,
+      isVerified: true,
       storageUsed: true,
       storageLimit: true,
       createdAt: true,
@@ -163,7 +183,9 @@ export const refreshAccessToken = async (
 ): Promise<RefreshResult> => {
   const record = await prisma.refreshToken.findUnique({
     where: { tokenHash: hashToken(refreshToken) },
-    include: { user: { select: { id: true, email: true } } },
+    include: {
+      user: { select: { id: true, email: true, tokenVersion: true } },
+    },
   });
 
   if (!record) {
@@ -199,7 +221,11 @@ export const refreshAccessToken = async (
   });
 
   return {
-    token: signAccessToken({ id: record.user.id, email: record.user.email }),
+    token: signAccessToken({
+      id: record.user.id,
+      email: record.user.email,
+      tokenVersion: record.user.tokenVersion,
+    }),
     refreshToken: newPlaintext,
   };
 };
@@ -225,5 +251,10 @@ export const revokeAllUserTokens = async (userId: string): Promise<void> => {
   await prisma.refreshToken.updateMany({
     where: { userId, revokedAt: null },
     data: { revokedAt: new Date() },
+  });
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { tokenVersion: { increment: 1 } },
   });
 };

@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   RefreshToken: 'RefreshToken',
+  PasswordResetToken: 'PasswordResetToken',
   File: 'File'
 } as const
 
@@ -76,6 +77,9 @@ export const UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   password: 'password',
+  role: 'role',
+  isVerified: 'isVerified',
+  tokenVersion: 'tokenVersion',
   storageUsed: 'storageUsed',
   storageLimit: 'storageLimit',
   createdAt: 'createdAt'
@@ -98,6 +102,18 @@ export const RefreshTokenScalarFieldEnum = {
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
 
 
+export const PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  tokenHash: 'tokenHash',
+  userId: 'userId',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
 export const FileScalarFieldEnum = {
   id: 'id',
   fileName: 'fileName',
@@ -107,8 +123,10 @@ export const FileScalarFieldEnum = {
   etag: 'etag',
   checksum: 'checksum',
   visibility: 'visibility',
+  parentId: 'parentId',
   ownerId: 'ownerId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof FileScalarFieldEnum]

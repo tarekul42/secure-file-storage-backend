@@ -213,6 +213,7 @@ describe("Files API", () => {
 
       expect(res.status).toBe(200);
       expect(res.body.visibility).toBe("PUBLIC");
+      expect(res.body.updatedAt).toBeTruthy();
     });
 
     it("forbids a non-owner from toggling visibility", async () => {

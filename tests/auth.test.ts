@@ -26,6 +26,8 @@ describe("Auth API", () => {
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty("token");
       expect(res.body.user.email).toBe(email);
+      expect(res.body.user.role).toBe("USER");
+      expect(res.body.user.isVerified).toBe(false);
       expect(res.body.user).not.toHaveProperty("password");
     });
 
@@ -98,6 +100,8 @@ describe("Auth API", () => {
 
       expect(res.status).toBe(200);
       expect(res.body.user.email).toBe(email);
+      expect(res.body.user.role).toBe("USER");
+      expect(res.body.user.isVerified).toBe(false);
     });
 
     it("returns 401 without a token", async () => {

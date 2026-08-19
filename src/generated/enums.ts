@@ -15,3 +15,11 @@ export const Visibility = {
 } as const
 
 export type Visibility = (typeof Visibility)[keyof typeof Visibility]
+
+
+export const Role = {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+} as const
+
+export type Role = (typeof Role)[keyof typeof Role]
