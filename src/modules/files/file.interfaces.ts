@@ -51,6 +51,49 @@ export interface ListFilesResult {
   nextCursor?: string | null;
 }
 
+export interface StartMultipartInput {
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+}
+
+export interface StartMultipartResult {
+  uploadId: string;
+  s3Key: string;
+  partSize: number;
+  partCount: number;
+  fileName: string;
+}
+
+export interface MultipartPartUrlInput {
+  uploadId: string;
+  s3Key: string;
+  partNumber: number;
+}
+
+export interface MultipartPartUrlResult {
+  partUrl: string;
+  uploadId: string;
+  s3Key: string;
+  partNumber: number;
+}
+
+export interface MultipartPart {
+  PartNumber: number;
+  ETag: string;
+}
+
+export interface CompleteMultipartInput {
+  uploadId: string;
+  s3Key: string;
+  parts: MultipartPart[];
+}
+
+export interface AbortMultipartInput {
+  uploadId: string;
+  s3Key: string;
+}
+
 export interface FileItem {
   id: string;
   fileName: string;

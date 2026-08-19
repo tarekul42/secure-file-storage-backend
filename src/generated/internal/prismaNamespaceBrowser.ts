@@ -54,7 +54,8 @@ export const ModelName = {
   User: 'User',
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken',
-  File: 'File'
+  File: 'File',
+  MultipartUpload: 'MultipartUpload'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -130,6 +131,24 @@ export const FileScalarFieldEnum = {
 } as const
 
 export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof FileScalarFieldEnum]
+
+
+export const MultipartUploadScalarFieldEnum = {
+  id: 'id',
+  uploadId: 'uploadId',
+  s3Key: 's3Key',
+  fileName: 'fileName',
+  mimeType: 'mimeType',
+  fileSize: 'fileSize',
+  partSize: 'partSize',
+  partCount: 'partCount',
+  ownerId: 'ownerId',
+  completedAt: 'completedAt',
+  abortedAt: 'abortedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type MultipartUploadScalarFieldEnum = (typeof MultipartUploadScalarFieldEnum)[keyof typeof MultipartUploadScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -3,12 +3,16 @@ import type { AuthenticatedRequest } from "../../middleware/types.js";
 import { asyncHandler } from "../../utils/async-handler.js";
 import type { Visibility } from "./file.interfaces.js";
 import {
+  abortMultipartUpload,
+  completeMultipartUpload,
   createFileMetadata,
   deleteFile,
   getDownloadUrl,
+  getMultipartPartUrl,
   getPublicShare,
   listUserFiles,
   requestUploadUrl,
+  startMultipartUpload,
   updateFileVisibility,
 } from "./file.service.js";
 
@@ -28,6 +32,34 @@ export const createMetadata = asyncHandler(
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const file = await createFileMetadata(userIdOf(req), req.body);
     res.status(201).json(file);
+  },
+);
+
+export const startMultipart = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const result = await startMultipartUpload(userIdOf(req), req.body);
+    res.json(result);
+  },
+);
+
+export const partUrl = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const result = await getMultipartPartUrl(userIdOf(req), req.body);
+    res.json(result);
+  },
+);
+
+export const completeMultipart = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const file = await completeMultipartUpload(userIdOf(req), req.body);
+    res.status(201).json(file);
+  },
+);
+
+export const abortMultipart = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    await abortMultipartUpload(userIdOf(req), req.body);
+    res.status(204).send();
   },
 );
 

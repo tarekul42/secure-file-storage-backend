@@ -1,6 +1,8 @@
 import {
+  AbortMultipartUploadCommand,
   DeleteObjectCommand,
   HeadObjectCommand,
+  ListMultipartUploadsCommand,
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import path from "node:path";
@@ -8,6 +10,7 @@ import { fileURLToPath } from "node:url";
 import { env } from "../config/env.js";
 import { prisma } from "../db/prisma.js";
 import { s3 } from "../db/s3.js";
+import { FILE_LIMITS } from "../modules/files/file.constants.js";
 import { logger } from "../utils/logger.js";
 
 const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
@@ -20,6 +23,18 @@ export const findOrphanedKeys = (
   dbKeys: Set<string>,
   s3Keys: string[],
 ): string[] => s3Keys.filter((key) => isAppKey(key) && !dbKeys.has(key));
+
+export interface MultipartUploadSummary {
+  Key: string;
+  UploadId: string;
+  Initiated: Date;
+}
+
+export const findStaleMultipartUploads = (
+  uploads: MultipartUploadSummary[],
+  staleBefore: Date,
+): MultipartUploadSummary[] =>
+  uploads.filter((upload) => upload.Initiated < staleBefore);
 
 export const listAllObjectKeys = async (): Promise<string[]> => {
   const keys: string[] = [];
@@ -72,6 +87,74 @@ const reportMissingObjects = async (): Promise<void> => {
   );
 };
 
+const reportStaleMultipartUploads = async (apply: boolean): Promise<void> => {
+  const staleBefore = new Date(Date.now() - FILE_LIMITS.MULTIPART_STALE_MS);
+
+  const result = await s3.send(
+    new ListMultipartUploadsCommand({ Bucket: env.AWS_S3_BUCKET_NAME }),
+  );
+
+  const appUploads = (result.Uploads ?? []).filter(
+    (upload) => upload.Key && isAppKey(upload.Key),
+  ) as MultipartUploadSummary[];
+
+  const stale = findStaleMultipartUploads(appUploads, staleBefore);
+
+  const staleDbRecords = await prisma.multipartUpload.findMany({
+    where: {
+      completedAt: null,
+      abortedAt: null,
+      createdAt: { lt: staleBefore },
+    },
+  });
+
+  logger.info(
+    { s3Stale: stale.length, dbStale: staleDbRecords.length },
+    "Stale multipart upload scan complete",
+  );
+
+  const doAbort = (): Promise<void> =>
+    Promise.all(
+      stale.map(async (upload) => {
+        await s3.send(
+          new AbortMultipartUploadCommand({
+            Bucket: env.AWS_S3_BUCKET_NAME,
+            Key: upload.Key,
+            UploadId: upload.UploadId,
+          }),
+        );
+        logger.info(
+          { s3Key: upload.Key, uploadId: upload.UploadId },
+          "Aborted stale multipart upload",
+        );
+      }),
+    ).then(() => undefined);
+
+  const doMark = (): Promise<unknown> =>
+    prisma.multipartUpload.updateMany({
+      where: { id: { in: staleDbRecords.map((record) => record.id) } },
+      data: { abortedAt: new Date() },
+    });
+
+  if (apply) {
+    await doAbort();
+    await doMark();
+  } else {
+    for (const upload of stale) {
+      logger.info(
+        { s3Key: upload.Key, uploadId: upload.UploadId },
+        "Stale multipart upload (dry-run; pass --apply to abort)",
+      );
+    }
+    for (const record of staleDbRecords) {
+      logger.info(
+        { id: record.id, uploadId: record.uploadId },
+        "Stale multipart DB record (dry-run; pass --apply to mark aborted)",
+      );
+    }
+  }
+};
+
 const main = async (): Promise<void> => {
   const apply = process.argv.includes("--apply");
   const reportMissing = process.argv.includes("--missing");
@@ -107,6 +190,8 @@ const main = async (): Promise<void> => {
   if (reportMissing) {
     await reportMissingObjects();
   }
+
+  await reportStaleMultipartUploads(apply);
 
   await prisma.$disconnect();
 };

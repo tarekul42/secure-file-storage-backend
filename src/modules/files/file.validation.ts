@@ -50,6 +50,77 @@ export const createFileMetadataSchema = {
   }),
 };
 
+const multipartUploadSchema = {
+  body: z.object({
+    uploadId: z.string().trim().min(1, "uploadId is required").max(1024),
+    s3Key: z.string().trim().min(1, "s3Key is required").max(2048),
+  }),
+};
+
+export const startMultipartUploadSchema = {
+  body: z.object({
+    fileName: z
+      .string()
+      .trim()
+      .min(1, "fileName is required")
+      .max(FILE_LIMITS.MAX_FILENAME_LENGTH, "fileName is too long"),
+    fileType: z
+      .string()
+      .trim()
+      .min(1, "fileType is required")
+      .max(255, "fileType is too long")
+      .refine(isAllowedContentType, `fileType ${NOT_ALLOWED_MESSAGE}`),
+    fileSize: z
+      .number()
+      .int("fileSize must be an integer")
+      .nonnegative("fileSize must be non-negative")
+      .gt(
+        FILE_LIMITS.MAX_SIZE_BYTES,
+        "Use the single-PUT upload for files up to 100MB",
+      )
+      .max(
+        FILE_LIMITS.MULTIPART_MAX_SIZE_BYTES,
+        "File size exceeds the 5GB multipart limit",
+      ),
+  }),
+};
+
+export const multipartPartUrlSchema = {
+  body: z.object({
+    uploadId: z.string().trim().min(1, "uploadId is required").max(1024),
+    s3Key: z.string().trim().min(1, "s3Key is required").max(2048),
+    partNumber: z
+      .number()
+      .int("partNumber must be an integer")
+      .min(1, "partNumber must be at least 1")
+      .max(
+        FILE_LIMITS.MULTIPART_MAX_PART_COUNT,
+        `partNumber must be at most ${FILE_LIMITS.MULTIPART_MAX_PART_COUNT}`,
+      ),
+  }),
+};
+
+export const completeMultipartUploadSchema = {
+  body: z.object({
+    uploadId: z.string().trim().min(1, "uploadId is required").max(1024),
+    s3Key: z.string().trim().min(1, "s3Key is required").max(2048),
+    parts: z
+      .array(
+        z.object({
+          PartNumber: z
+            .number()
+            .int("PartNumber must be an integer")
+            .min(1, "PartNumber must be at least 1")
+            .max(FILE_LIMITS.MULTIPART_MAX_PART_COUNT),
+          ETag: z.string().trim().min(1, "ETag is required").max(2048),
+        }),
+      )
+      .min(1, "parts must include at least one part"),
+  }),
+};
+
+export const abortMultipartUploadSchema = multipartUploadSchema;
+
 export const fileIdParamsSchema = {
   params: z.object({
     id: z.string().uuid("A valid file id is required"),

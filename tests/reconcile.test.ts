@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { findOrphanedKeys, isAppKey } from "../src/jobs/reconcile.js";
+import {
+  findOrphanedKeys,
+  findStaleMultipartUploads,
+  isAppKey,
+} from "../src/jobs/reconcile.js";
 
 const UUID = "123e4567-e89b-12d3-a456-426614174000";
 const OTHER_UUID = "223e4567-e89b-12d3-a456-426614174000";
@@ -34,6 +38,28 @@ describe("reconcile helpers", () => {
     it("returns an empty list when nothing is orphaned", () => {
       const key = `${UUID}/${OTHER_UUID}-known.bin`;
       expect(findOrphanedKeys(new Set([key]), [key])).toEqual([]);
+    });
+  });
+
+  describe("findStaleMultipartUploads", () => {
+    const now = new Date("2026-01-02T00:00:00Z");
+    const stale = {
+      Key: `${UUID}/${OTHER_UUID}-stale.bin`,
+      UploadId: "upload-1",
+      Initiated: new Date("2026-01-01T00:00:00Z"),
+    };
+    const fresh = {
+      Key: `${UUID}/${OTHER_UUID}-fresh.bin`,
+      UploadId: "upload-2",
+      Initiated: new Date("2026-01-02T12:00:00Z"),
+    };
+
+    it("returns only uploads initiated before the cutoff", () => {
+      expect(findStaleMultipartUploads([stale, fresh], now)).toEqual([stale]);
+    });
+
+    it("returns an empty list when nothing is stale", () => {
+      expect(findStaleMultipartUploads([fresh], now)).toEqual([]);
     });
   });
 });

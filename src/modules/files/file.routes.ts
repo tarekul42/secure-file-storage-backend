@@ -2,23 +2,59 @@ import { Router } from "express";
 import { authenticate } from "../../middleware/auth.middleware.js";
 import { validate } from "../../middleware/validate.middleware.js";
 import {
+  abortMultipart,
+  completeMultipart,
   createMetadata,
   downloadFile,
   listFiles,
+  partUrl,
   removeFile,
   requestUpload,
   shareFile,
+  startMultipart,
   updateVisibility,
 } from "./file.controller.js";
 import {
+  abortMultipartUploadSchema,
+  completeMultipartUploadSchema,
   createFileMetadataSchema,
   fileIdParamsSchema,
   listFilesQuerySchema,
+  multipartPartUrlSchema,
   requestUploadSchema,
+  startMultipartUploadSchema,
   updateVisibilitySchema,
 } from "./file.validation.js";
 
 const router = Router();
+
+router.post(
+  "/multipart/start",
+  authenticate,
+  validate(startMultipartUploadSchema),
+  startMultipart,
+);
+
+router.post(
+  "/multipart/part-url",
+  authenticate,
+  validate(multipartPartUrlSchema),
+  partUrl,
+);
+
+router.post(
+  "/multipart/complete",
+  authenticate,
+  validate(completeMultipartUploadSchema),
+  completeMultipart,
+);
+
+router.post(
+  "/multipart/abort",
+  authenticate,
+  validate(abortMultipartUploadSchema),
+  abortMultipart,
+);
 
 router.post(
   "/upload-url",

@@ -29,6 +29,7 @@ model User {
   files              File[]
   refreshTokens      RefreshToken[]
   passwordResetTokens PasswordResetToken[]
+  multipartUploads   MultipartUpload[]
   createdAt          DateTime             @default(now())
 }
 
@@ -68,4 +69,20 @@ model File {
   owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+}
+
+model MultipartUpload {
+  id          String    @id @default(uuid())
+  uploadId    String    @unique
+  s3Key       String
+  fileName    String
+  mimeType    String
+  fileSize    Int
+  partSize    Int
+  partCount   Int
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  completedAt DateTime?
+  abortedAt   DateTime?
+  createdAt   DateTime  @default(now())
 }

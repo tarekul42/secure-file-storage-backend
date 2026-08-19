@@ -37,3 +37,8 @@ export type PasswordResetToken = Prisma.PasswordResetTokenModel
  * 
  */
 export type File = Prisma.FileModel
+/**
+ * Model MultipartUpload
+ * 
+ */
+export type MultipartUpload = Prisma.MultipartUploadModel
