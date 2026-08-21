@@ -3,10 +3,17 @@
 import { useState, type ChangeEvent } from "react";
 import axios from "axios";
 import api, { getErrorMessage } from "@/lib/api";
-import type { FileItem, RequestUploadResponse } from "@/lib/types";
+import type {
+  FileItem,
+  MultipartPart,
+  MultipartPartUrlResponse,
+  MultipartStartResponse,
+  RequestUploadResponse,
+} from "@/lib/types";
 import { UploadCloud } from "lucide-react";
 
-const MAX_FILE_SIZE = 100 * 1024 * 1024;
+const SINGLE_PUT_MAX_SIZE = 100 * 1024 * 1024;
+const MULTIPART_MAX_SIZE = 5 * 1024 * 1024 * 1024;
 
 function formatFileSize(bytes: number): string {
   if (bytes >= 1024 * 1024 * 1024)
@@ -14,6 +21,97 @@ function formatFileSize(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   return `${(bytes / 1024).toFixed(1)} KB`;
 }
+
+const uploadSinglePut = async (
+  file: File,
+  fileType: string,
+  onProgress: (percent: number) => void,
+): Promise<FileItem> => {
+  const { data: upload } = await api.post<RequestUploadResponse>(
+    "/files/upload-url",
+    {
+      fileName: file.name,
+      fileType,
+      fileSize: file.size,
+    },
+  );
+
+  await axios.put(upload.uploadUrl, file, {
+    headers: { "Content-Type": fileType },
+    onUploadProgress: (progressEvent) => {
+      if (progressEvent.total) {
+        const percent = Math.round(
+          (progressEvent.loaded * 100) / progressEvent.total,
+        );
+        onProgress(Math.min(percent, 100));
+      }
+    },
+  });
+
+  const { data: created } = await api.post<FileItem>("/files", {
+    fileName: file.name,
+    s3Key: upload.s3Key,
+    fileSize: file.size,
+    mimeType: fileType,
+  });
+
+  return created;
+};
+
+const uploadMultipart = async (
+  file: File,
+  fileType: string,
+  onProgress: (percent: number) => void,
+): Promise<FileItem> => {
+  const { data: start } = await api.post<MultipartStartResponse>(
+    "/files/multipart/start",
+    {
+      fileName: file.name,
+      fileType,
+      fileSize: file.size,
+    },
+  );
+
+  const parts: MultipartPart[] = [];
+  let uploadedBytes = 0;
+
+  for (let partNumber = 1; partNumber <= start.partCount; partNumber++) {
+    const startByte = (partNumber - 1) * start.partSize;
+    const endByte = Math.min(startByte + start.partSize, file.size);
+    const chunk = file.slice(startByte, endByte);
+
+    const { data: part } = await api.post<MultipartPartUrlResponse>(
+      "/files/multipart/part-url",
+      {
+        uploadId: start.uploadId,
+        s3Key: start.s3Key,
+        partNumber,
+      },
+    );
+
+    const response = await axios.put(part.partUrl, chunk, {
+      headers: { "Content-Type": fileType },
+    });
+
+    const etag = (response.headers.etag as string | undefined) ?? "";
+    parts.push({ PartNumber: partNumber, ETag: etag });
+    uploadedBytes += chunk.size;
+    onProgress(
+      Math.min(Math.round((uploadedBytes * 100) / file.size), 100),
+    );
+  }
+
+  const { data: created } = await api.post<FileItem>(
+    "/files/multipart/complete",
+    {
+      uploadId: start.uploadId,
+      s3Key: start.s3Key,
+      parts,
+    },
+  );
+
+  return created;
+};
 
 export default function FileUpload({
   onUploadSuccess,
@@ -31,8 +129,8 @@ export default function FileUpload({
     e.target.value = "";
     if (!file) return;
 
-    if (file.size > MAX_FILE_SIZE) {
-      onError("File exceeds the 100 MB upload limit.");
+    if (file.size > MULTIPART_MAX_SIZE) {
+      onError("File exceeds the 5 GB upload limit.");
       return;
     }
 
@@ -42,33 +140,11 @@ export default function FileUpload({
     onError("");
 
     try {
-      const { data: upload } = await api.post<RequestUploadResponse>(
-        "/files/upload-url",
-        {
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-        },
-      );
-
-      await axios.put(upload.uploadUrl, file, {
-        headers: { "Content-Type": file.type },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percent = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total,
-            );
-            setProgress(Math.min(percent, 100));
-          }
-        },
-      });
-
-      const { data: created } = await api.post<FileItem>("/files", {
-        fileName: file.name,
-        s3Key: upload.s3Key,
-        fileSize: file.size,
-        mimeType: file.type,
-      });
+      const fileType = file.type || "application/octet-stream";
+      const created =
+        file.size > SINGLE_PUT_MAX_SIZE
+          ? await uploadMultipart(file, fileType, setProgress)
+          : await uploadSinglePut(file, fileType, setProgress);
 
       onUploadSuccess(created);
     } catch (err) {
@@ -98,7 +174,8 @@ export default function FileUpload({
           {uploading ? "Uploading…" : "Click to upload"}
         </span>
         <span className="text-sm text-zinc-500">
-          Maximum file size: {formatFileSize(MAX_FILE_SIZE)}
+          Maximum file size: {formatFileSize(MULTIPART_MAX_SIZE)} (multipart for
+          large files)
         </span>
       </label>
 

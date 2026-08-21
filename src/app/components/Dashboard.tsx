@@ -7,7 +7,7 @@ import FileUpload from "./FileUpload";
 import { getErrorMessage } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import api from "@/lib/api";
-import type { DownloadResponse, FileItem } from "@/lib/types";
+import type { DownloadResponse, FileItem, FileListResponse } from "@/lib/types";
 
 function formatFileSize(bytes: number): string {
   if (bytes >= 1024 * 1024 * 1024)
@@ -19,16 +19,20 @@ function formatFileSize(bytes: number): string {
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const [files, setFiles] = useState<FileItem[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     api
-      .get<FileItem[]>("/files")
+      .get<FileListResponse>("/files?limit=20")
       .then(({ data }) => {
-        if (!cancelled) setFiles(data);
+        if (cancelled) return;
+        setFiles(data.files);
+        setNextCursor(data.nextCursor);
       })
       .catch((err) => {
         if (!cancelled) setError(getErrorMessage(err));
@@ -41,6 +45,25 @@ export default function Dashboard() {
       cancelled = true;
     };
   }, []);
+
+  const loadMore = async () => {
+    if (!nextCursor) return;
+    setLoadingMore(true);
+    try {
+      const { data } = await api.get<FileListResponse>(
+        `/files?limit=20&cursor=${nextCursor}`,
+      );
+      setFiles((prev) => {
+        const known = new Set(prev.map((f) => f.id));
+        return [...prev, ...data.files.filter((f) => !known.has(f.id))];
+      });
+      setNextCursor(data.nextCursor);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const toggleVisibility = async (file: FileItem) => {
     try {
@@ -187,6 +210,16 @@ export default function Dashboard() {
               </li>
             ))}
           </ul>
+        )}
+
+        {nextCursor && !loading && (
+          <button
+            onClick={() => void loadMore()}
+            disabled={loadingMore}
+            className="mt-4 w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            {loadingMore ? "Loading more…" : "Load more files"}
+          </button>
         )}
       </div>
     </div>

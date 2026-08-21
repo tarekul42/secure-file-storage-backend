@@ -3,6 +3,10 @@ export type Visibility = "PUBLIC" | "PRIVATE";
 export interface AuthUser {
   id: string;
   email: string;
+  role: "USER" | "ADMIN";
+  isVerified: boolean;
+  storageUsed: number;
+  storageLimit: number;
   createdAt: string;
 }
 
@@ -20,6 +24,11 @@ export interface FileItem {
   visibility: Visibility;
   ownerId: string;
   createdAt: string;
+}
+
+export interface FileListResponse {
+  files: FileItem[];
+  nextCursor: string | null;
 }
 
 export interface DownloadResponse {
@@ -44,4 +53,24 @@ export interface RequestUploadResponse {
   uploadUrl: string;
   s3Key: string;
   fileName: string;
+}
+
+export interface MultipartStartResponse {
+  uploadId: string;
+  s3Key: string;
+  partSize: number;
+  partCount: number;
+  fileName: string;
+}
+
+export interface MultipartPartUrlResponse {
+  partUrl: string;
+  uploadId: string;
+  s3Key: string;
+  partNumber: number;
+}
+
+export interface MultipartPart {
+  PartNumber: number;
+  ETag: string;
 }
