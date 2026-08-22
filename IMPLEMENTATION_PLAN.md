@@ -150,7 +150,20 @@ numbering reflects recommended sequencing (risk-per-effort). Effort: S < 1 day �
 
 ---
 
-## Phase 3 — Session lifecycle completion
+## Phase 3 — Session lifecycle completion ✅ DONE (2026-08-22)
+
+> **Implemented:** frontend `logout` now calls `POST /auth/logout` with the stored refresh
+> token (best-effort) before clearing local state (R2); refresh rotation is a single
+> `$transaction` with a DB-trigger-injected crash test proving both writes roll back and
+> no reuse-detection false positive remains (SEC-07/F2); unknown-email logins run a dummy
+> bcrypt compare, flattening the account-enumeration timing side-channel, covered by a
+> loose latency-parity test (SEC-05 part); MinIO verified to expose ETag via its default
+> CORS policy (empirically tested against minio/minio:latest), compose init left clean,
+> and `docker/s3-bucket-cors-production.xml` added as a ready-to-apply PutBucketCors
+> artifact for production S3 buckets (F3); multipart uploader now fails loudly when a
+> part response lacks a readable ETag; demo login button gated behind
+> `NEXT_PUBLIC_SHOW_DEMO_LOGIN` (F8). Gates: 80 backend tests + lint/format/typecheck,
+> frontend lint/build green; live smoke: rotate → logout 204 → refresh-after-logout 401.
 
 > Goal: finish what R1 started — logout revokes server-side, rotation is crash-safe, login
 > timing is flat. Absorbs: R2, SEC-07 (F2), SEC-05-timing (C1), F3 (MinIO CORS + ETag loudness).

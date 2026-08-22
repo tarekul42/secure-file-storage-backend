@@ -72,6 +72,53 @@ describe("Refresh token flow", () => {
     expect(afterReuse.status).toBe(401);
   });
 
+  it("rolls back atomically when rotation fails after creating the successor", async () => {
+    const { refreshToken } = await registerUser("rotate@example.com");
+    const user = await prisma.user.findUnique({
+      where: { email: "rotate@example.com" },
+    });
+
+    // Simulate a crash between the two rotation writes at the database
+    // level: a trigger makes every RefreshToken UPDATE raise, so the
+    // in-flight transaction must roll back BOTH the successor insert and
+    // the replacedById mark.
+    await prisma.$executeRawUnsafe(
+      `CREATE FUNCTION tests_fail_refresh_update() RETURNS trigger AS $$
+       BEGIN RAISE EXCEPTION 'simulated crash mid-rotation'; END;
+       $$ LANGUAGE plpgsql`,
+    );
+    await prisma.$executeRawUnsafe(
+      `CREATE TRIGGER tests_fail_refresh_update
+       BEFORE UPDATE ON "RefreshToken"
+       FOR EACH ROW EXECUTE FUNCTION tests_fail_refresh_update()`,
+    );
+
+    await request(app).post("/api/auth/refresh").send({ refreshToken });
+
+    await prisma.$executeRawUnsafe(
+      'DROP TRIGGER IF EXISTS tests_fail_refresh_update ON "RefreshToken"',
+    );
+    await prisma.$executeRawUnsafe(
+      "DROP FUNCTION IF EXISTS tests_fail_refresh_update",
+    );
+
+    const tokens = await prisma.refreshToken.findMany({
+      where: { userId: user!.id },
+    });
+    expect(tokens).toHaveLength(1);
+
+    const record = tokens[0];
+    expect(record?.revokedAt).toBeNull();
+    expect(record?.replacedById).toBeNull();
+
+    // The original token was never marked replaced, so it must still rotate
+    // cleanly — no reuse-detection false positive, no revoked family.
+    const retry = await request(app)
+      .post("/api/auth/refresh")
+      .send({ refreshToken });
+    expect(retry.status).toBe(200);
+  });
+
   it("POST /api/auth/logout revokes the refresh token", async () => {
     const { refreshToken } = await registerUser("refresh@example.com");
 

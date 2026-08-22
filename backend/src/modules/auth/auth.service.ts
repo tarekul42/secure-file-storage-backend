@@ -25,6 +25,13 @@ const hashToken = (token: string): string =>
 const generateRefreshToken = (): string =>
   crypto.randomBytes(48).toString("base64url");
 
+// Hash of an unknown random value. Compared against when the account does
+// not exist so login latency is dominated by bcrypt in both failure paths;
+// otherwise "unknown email" responds measurably faster than "wrong password"
+// and leaks which emails are registered.
+const DUMMY_PASSWORD_HASH =
+  "$2b$10$84yc74UQBnx9Y6d4Ufjx8.AdINI/oTMn9zvkRnVAzx1/xifqiWEHO";
+
 const toAuthUser = (user: {
   id: string;
   email: string;
@@ -126,6 +133,7 @@ export const loginUser = async (input: LoginUserInput): Promise<AuthResult> => {
     },
   });
   if (!user) {
+    await bcrypt.compare(input.password, DUMMY_PASSWORD_HASH);
     throw new ApiError(401, "Invalid email or password");
   }
 
@@ -205,19 +213,26 @@ export const refreshAccessToken = async (
     throw new ApiError(401, "Refresh token expired");
   }
 
-  const newPlaintext = generateRefreshToken();
-  const newRecord = await prisma.refreshToken.create({
-    data: {
-      tokenHash: hashToken(newPlaintext),
-      familyId: record.familyId,
-      userId: record.userId,
-      expiresAt: new Date(Date.now() + AUTH.REFRESH_TOKEN_TTL_MS),
-    },
-  });
+  // Rotation must be atomic: creating the successor and marking the current
+  // token as replaced happen together, so a crash mid-way cannot leave an
+  // orphan that is still valid for another refresh.
+  const newPlaintext = await prisma.$transaction(async (tx) => {
+    const plaintext = generateRefreshToken();
+    const newRecord = await tx.refreshToken.create({
+      data: {
+        tokenHash: hashToken(plaintext),
+        familyId: record.familyId,
+        userId: record.userId,
+        expiresAt: new Date(Date.now() + AUTH.REFRESH_TOKEN_TTL_MS),
+      },
+    });
 
-  await prisma.refreshToken.update({
-    where: { id: record.id },
-    data: { replacedById: newRecord.id },
+    await tx.refreshToken.update({
+      where: { id: record.id },
+      data: { replacedById: newRecord.id },
+    });
+
+    return plaintext;
   });
 
   return {

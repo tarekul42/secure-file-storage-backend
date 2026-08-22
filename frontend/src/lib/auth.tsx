@@ -20,7 +20,7 @@ interface AuthContextValue {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -67,10 +67,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    setUser(null);
+  const logout = useCallback(async () => {
+    // Revoke the server-side session first; local state is cleared
+    // regardless of the outcome (token may already be invalid).
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    try {
+      if (refreshToken) {
+        await api.post("/auth/logout", { refreshToken });
+      }
+    } catch {
+      // Best-effort revocation — fall through to local cleanup.
+    } finally {
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      setUser(null);
+    }
   }, []);
 
   const value = useMemo(

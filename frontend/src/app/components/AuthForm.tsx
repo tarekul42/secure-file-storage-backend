@@ -9,6 +9,10 @@ import { getErrorMessage } from "@/lib/api";
 const DEMO_EMAIL = "demo@example.com";
 const DEMO_PASSWORD = "password123";
 
+// Demo login advertises public credentials; keep it off unless the
+// environment explicitly opts in (never appropriate for real deployments).
+const SHOW_DEMO_LOGIN = process.env.NEXT_PUBLIC_SHOW_DEMO_LOGIN === "true";
+
 export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   const { login, register } = useAuth();
   const router = useRouter();
@@ -119,7 +123,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
           </button>
         </form>
 
-        {isLogin && (
+        {isLogin && SHOW_DEMO_LOGIN && (
           <div className="mt-4">
             <div className="flex items-center gap-3 text-xs text-zinc-400">
               <span className="flex-1 border-t border-zinc-200 dark:border-zinc-700" />

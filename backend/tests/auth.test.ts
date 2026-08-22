@@ -78,6 +78,33 @@ describe("Auth API", () => {
       expect(res.status).toBe(401);
     });
 
+    it("does not reveal account existence through response timing", async () => {
+      // Unknown-email logins must do comparable work to wrong-password
+      // logins (dummy bcrypt compare), otherwise latency leaks which
+      // emails are registered. Bounds are deliberately loose so the test
+      // stays stable on shared CI runners; a missing dummy compare makes
+      // unknown-email responses ~20x faster, far below any bound here.
+      const measure = async (targetEmail: string): Promise<number> => {
+        const samples: number[] = [];
+        for (let i = 0; i < 5; i++) {
+          const start = performance.now();
+          await request(app)
+            .post("/api/auth/login")
+            .send({ email: targetEmail, password: "definitely-wrong" });
+          samples.push(performance.now() - start);
+        }
+        return Math.min(...samples);
+      };
+
+      // Sequential on purpose: concurrent requests would contend for the
+      // event loop and skew the latency samples.
+      const unknownMs = await measure("no-such-account@example.com");
+      const knownMs = await measure(email);
+
+      expect(unknownMs).toBeGreaterThan(20);
+      expect(unknownMs).toBeGreaterThan(knownMs * 0.3);
+    });
+
     it("rejects a nonexistent user with 401", async () => {
       const res = await request(app)
         .post("/api/auth/login")

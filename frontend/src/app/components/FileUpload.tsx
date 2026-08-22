@@ -93,7 +93,17 @@ const uploadMultipart = async (
       headers: { "Content-Type": fileType },
     });
 
-    const etag = (response.headers.etag as string | undefined) ?? "";
+    const etag = response.headers.etag;
+    if (!etag) {
+      // Without a readable ETag the upload cannot be completed; failing
+      // loudly here beats an opaque "all parts must be uploaded" error at
+      // completion time. Missing ETag almost always means the bucket CORS
+      // config does not expose it.
+      throw new Error(
+        `Storage did not return an ETag for part ${partNumber}. ` +
+          "The bucket CORS configuration must expose the ETag header.",
+      );
+    }
     parts.push({ PartNumber: partNumber, ETag: etag });
     uploadedBytes += chunk.size;
     onProgress(

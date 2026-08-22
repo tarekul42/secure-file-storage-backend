@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Production bucket CORS configuration for AWS S3.
+  The browser reads the ETag response header of each presigned part PUT
+  during multipart upload; S3 buckets expose NO headers by default, so
+  without this rule completion fails with empty ETags.
+
+  Apply (replace the origin with your deployed frontend):
+    aws s3api put-bucket-cors --bucket <bucket> \
+      --cors-configuration file://docker/s3-bucket-cors-production.xml
+
+  Local MinIO does not need this: its default policy already exposes ETag
+  (verified against minio/minio:latest).
+-->
+<CORSConfiguration>
+  <CORSRule>
+    <AllowedOrigin>http://localhost:3000</AllowedOrigin>
+    <AllowedMethod>GET</AllowedMethod>
+    <AllowedMethod>PUT</AllowedMethod>
+    <AllowedMethod>HEAD</AllowedMethod>
+    <AllowedHeader>content-type</AllowedHeader>
+    <AllowedHeader>content-md5</AllowedHeader>
+    <ExposeHeader>etag</ExposeHeader>
+    <MaxAgeSeconds>3000</MaxAgeSeconds>
+  </CORSRule>
+</CORSConfiguration>
