@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend — gates & tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: secure_file_storage_test
+        ports:
+          - "5434:5432"
+        options: >-
+          --health-cmd "pg_isready -U postgres -d secure_file_storage_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      # Pin the official registry: local mirror configs do not exist on
+      # runners, but being explicit keeps audit results reproducible.
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5434/secure_file_storage_test
+      # prisma.config.ts routes CLI commands (validate/migrate) through DIRECT_URL.
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5434/secure_file_storage_test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dependency audit (production)
+        run: npm audit --omit=dev --audit-level=high
+        # Known open advisory: prisma (dev CLI only) -> deepmerge-ts stack
+        # exhaustion (GHSA-ggr8-5vv4-36mx); no patched 7.x release yet.
+        # Non-blocking until upstream ships a fix; Dependabot tracks it.
+        continue-on-error: true
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Generated-client sync check
+        run: git diff --exit-code -- src/generated
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
+
+      - name: Apply migrations to test database
+        run: npx prisma migrate deploy
+
+      - name: Tests
+        run: npm test
+
+  frontend:
+    name: Frontend — gates & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dependency audit (production)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build

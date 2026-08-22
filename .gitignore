@@ -7,3 +7,22 @@ Thumbs.db
 
 # Scratch / personal notes
 promts.txt
+
+# Environment files (per-app .gitignore files also apply; this is a safety net)
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Dependencies & build output (safety net; per-app ignores are authoritative)
+node_modules/
+dist/
+.next/
+
+# Logs
+*.log
+npm-debug.log*
+
+# AI / agent tooling local state
+.agents/
+.claude/
+.windsurf/
