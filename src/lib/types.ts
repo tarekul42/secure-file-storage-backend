@@ -12,7 +12,13 @@ export interface AuthUser {
 
 export interface AuthResponse {
   token: string;
+  refreshToken: string;
   user: AuthUser;
+}
+
+export interface RefreshTokenResponse {
+  token: string;
+  refreshToken: string;
 }
 
 export interface FileItem {

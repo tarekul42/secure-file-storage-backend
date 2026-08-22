@@ -9,10 +9,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import api from "./api";
+import api, {
+  ACCESS_TOKEN_KEY,
+  REFRESH_TOKEN_KEY,
+} from "./api";
 import type { AuthResponse, AuthUser } from "./types";
-
-const TOKEN_KEY = "token";
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -28,18 +29,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
-    return localStorage.getItem(TOKEN_KEY) !== null;
+    return localStorage.getItem(ACCESS_TOKEN_KEY) !== null;
   });
 
   useEffect(() => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     if (!token) return;
 
     api
       .get<{ user: AuthUser }>("/auth/me")
       .then(({ data }) => setUser(data.user))
       .catch(() => {
-        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
         setUser(null);
       })
       .finally(() => setLoading(false));
@@ -50,7 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
     });
-    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(ACCESS_TOKEN_KEY, data.token);
+    localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
     setUser(data.user);
   }, []);
 
@@ -59,12 +62,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
     });
-    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(ACCESS_TOKEN_KEY, data.token);
+    localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
     setUser(data.user);
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     setUser(null);
   }, []);
 
