@@ -113,7 +113,18 @@ numbering reflects recommended sequencing (risk-per-effort). Effort: S < 1 day �
 
 ---
 
-## Phase 2 — Repo consolidation, CI & supply chain
+## Phase 2 — Repo consolidation, CI & supply chain ✅ DONE (2026-08-22)
+
+> **Implemented:** consolidated into monorepo `tarekul42/secure-file-storage` via subtree
+> merges (backend 22 commits + frontend 6 commits, full history preserved under `backend/`
+> and `frontend/`); unified root `.gitignore`; `.github/workflows/ci.yml` (backend: audit +
+> prisma generate + generated-client sync check + typecheck + lint + format + validate +
+> migrate deploy + tests against Postgres service; frontend: audit + lint + build; registry
+> pinned to npmjs.org); Dependabot config (npm ×2 + github-actions, weekly); removed unused
+> `react-dropzone`. Generated client kept committed by policy with CI sync check.
+> Known open advisory documented in workflow (prisma dev CLI → deepmerge-ts
+> GHSA-ggr8-5vv4-36mx, no patched 7.x yet) — audit step non-blocking for that only.
+> First CI run green. Old repos left intact for archiving by owner.
 
 > Goal: one repo, automated gates on every push, dependency vulnerability visibility restored.
 > Absorbs: R11, R3, SEC-B (SEC-10), F9. Depends on: nothing (Phase 1 not required first).

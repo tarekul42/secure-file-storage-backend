@@ -79,7 +79,7 @@ Work items:
 valid until its 30-day expiry. Call `POST /api/auth/logout` (fire-and-forget is fine) before
 clearing local state.
 
-### R3. CI workflow 🟠
+### R3. CI workflow 🟠 ✅ DONE (Phase 2 of IMPLEMENTATION_PLAN.md)
 
 No `.github/workflows/ci.yml` exists anywhere (root, `backend/`, `frontend/`). All gates
 already exist as scripts — wiring them up is mechanical:
@@ -161,7 +161,7 @@ Client retries after timeout can double-register. Accept `Idempotency-Key` heade
 - `db/prisma.ts`: pool sizing / connection timeout via `PrismaPg` options; verify
   reconnection after a Postgres restart.
 
-### R11. Repo consolidation ⚪ (P0-3)
+### R11. Repo consolidation ⚪ ✅ DONE (Phase 2 of IMPLEMENTATION_PLAN.md)
 
 Root has **no** `.git`; `backend/` and `frontend/` each have their own. Merge into one repo
 at the root with unified `.gitignore`. Decide on `backend/src/generated/`: either stop

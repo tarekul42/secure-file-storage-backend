@@ -19,6 +19,8 @@ you complete an item.
 
 ## Commands
 
+This is a single monorepo (`backend/` + `frontend/`) — remotes: `origin` = `tarekul42/secure-file-storage`.
+
 All backend commands run from `backend/`:
 
 ```bash
@@ -101,10 +103,9 @@ Execution now tracks `IMPLEMENTATION_PLAN.md` (hybrid of UPGRADE_PLAN, REMAINING
 SECURITY_ANALYSIS). Phase 1 (critical fixes: log redaction, BigInt fileSize migration,
 secret floors, seed guard) is ✅ done. Next up:
 
-1. Phase 2 — repo consolidation + CI workflow with working `npm audit` + Dependabot.
-2. Phase 3 — real logout (call `/auth/logout`), transactional refresh rotation,
+1. Phase 3 — real logout (call `/auth/logout`), transactional refresh rotation,
    timing-flat login, MinIO bucket CORS/ETag.
-3. Phase 4 — forgot/reset-password endpoints (`PasswordResetToken` table exists) + pages.
-4. Phase 5 — upload/content defense: drop SVG from allow-list, force attachment
+2. Phase 4 — forgot/reset-password endpoints (`PasswordResetToken` table exists) + pages.
+3. Phase 5 — upload/content defense: drop SVG from allow-list, force attachment
    downloads, magic-byte sniffing, file-count cap.
-5. Phases 6–8 per IMPLEMENTATION_PLAN.md.
+4. Phases 6–8 per IMPLEMENTATION_PLAN.md.
