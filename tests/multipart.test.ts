@@ -279,6 +279,44 @@ describe("Multipart uploads API", () => {
       expect(record?.completedAt).not.toBeNull();
     });
 
+    it("registers sizes above the INTEGER range (2GiB) without overflow", async () => {
+      // Regression: fileSize was INTEGER, which overflows at 2^31 - 1 while the
+      // API advertises up to 5 GB. 3 GB exercises the broken boundary.
+      const THREE_GB = 3 * 1024 * 1024 * 1024;
+      const token = await registerUser("bigsize@example.com");
+      await prisma.user.update({
+        where: { email: "bigsize@example.com" },
+        data: { storageLimit: BigInt(6 * 1024 * 1024 * 1024) },
+      });
+      s3State.objectSize = THREE_GB;
+
+      const started = await start(token, { fileSize: THREE_GB });
+      expect(started.status).toBe(200);
+
+      const res = await request(app)
+        .post("/api/files/multipart/complete")
+        .set(auth(token))
+        .send({
+          uploadId: started.body.uploadId,
+          s3Key: started.body.s3Key,
+          parts: validParts(Math.ceil(THREE_GB / PART_SIZE)),
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.fileSize).toBe(THREE_GB);
+
+      const row = await prisma.file.findUnique({
+        where: { id: res.body.id },
+      });
+      expect(row?.fileSize).toBe(BigInt(THREE_GB));
+
+      const user = await prisma.user.findUnique({
+        where: { email: "bigsize@example.com" },
+        select: { storageUsed: true },
+      });
+      expect(user?.storageUsed).toBe(BigInt(THREE_GB));
+    });
+
     it("rejects a size mismatch between the assembled object and the registered size", async () => {
       const token = await registerUser("owner@example.com");
       const { body } = await start(token);

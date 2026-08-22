@@ -3,7 +3,8 @@ import { asyncHandler } from "../../utils/async-handler.js";
 import { checkReadiness } from "./health.service.js";
 
 export const liveness = (_req: Request, res: Response): void => {
-  res.json({ status: "ok", uptime: process.uptime() });
+  // Deliberately minimal: no runtime detail (uptime, versions) that aids fingerprinting.
+  res.json({ status: "ok" });
 };
 
 export const readiness = asyncHandler(

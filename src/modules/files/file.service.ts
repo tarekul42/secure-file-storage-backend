@@ -37,6 +37,16 @@ import type {
 const sanitizeFileName = (fileName: string): string =>
   fileName.replace(/[\\/]+/g, "_").slice(0, FILE_LIMITS.MAX_FILENAME_LENGTH);
 
+// File/MultipartUpload.fileSize are BigInt columns (5 GB exceeds INTEGER range).
+// BigInt values cannot pass through res.json, so every response maps them to
+// JSON-safe numbers (safe up to 9 PB, far beyond the 5 GB cap).
+const serializeFile = <T extends { fileSize: bigint }>(
+  file: T,
+): Omit<T, "fileSize"> & { fileSize: number } => {
+  const { fileSize, ...rest } = file;
+  return { ...rest, fileSize: Number(fileSize) };
+};
+
 const assertQuotaAvailable = async (
   userId: string,
   fileSize: number,
@@ -72,7 +82,7 @@ export const requestUploadUrl = async (
   });
 
   const uploadUrl = await getSignedUrl(s3, command, {
-    expiresIn: FILE_LIMITS.UPLOAD_URL_EXPIRATION_MS,
+    expiresIn: FILE_LIMITS.UPLOAD_URL_EXPIRATION_SECONDS,
   });
 
   return { uploadUrl, s3Key, fileName: safeFileName };
@@ -126,30 +136,32 @@ const registerObject = async (userId: string, input: RegisterObjectInput) => {
 
   const etag = head.ETag?.replace(/^"(.*)"$/, "$1") ?? null;
 
-  return prisma.$transaction(async (tx) => {
-    const reserved = await tx.$executeRaw`
+  return prisma
+    .$transaction(async (tx) => {
+      const reserved = await tx.$executeRaw`
       UPDATE "User"
       SET "storageUsed" = "storageUsed" + ${input.fileSize}
       WHERE "id" = ${userId}
         AND "storageUsed" + ${input.fileSize} <= "storageLimit"
     `;
 
-    if (reserved === 0) {
-      throw new ApiError(413, "Storage quota exceeded");
-    }
+      if (reserved === 0) {
+        throw new ApiError(413, "Storage quota exceeded");
+      }
 
-    return tx.file.create({
-      data: {
-        fileName: sanitizeFileName(input.fileName),
-        s3Key: input.s3Key,
-        fileSize: input.fileSize,
-        mimeType: input.mimeType,
-        etag,
-        checksum: input.deriveChecksum ? etag : null,
-        ownerId: userId,
-      },
-    });
-  });
+      return tx.file.create({
+        data: {
+          fileName: sanitizeFileName(input.fileName),
+          s3Key: input.s3Key,
+          fileSize: BigInt(input.fileSize),
+          mimeType: input.mimeType,
+          etag,
+          checksum: input.deriveChecksum ? etag : null,
+          ownerId: userId,
+        },
+      });
+    })
+    .then(serializeFile);
 };
 
 export const createFileMetadata = async (
@@ -220,7 +232,7 @@ export const startMultipartUpload = async (
       s3Key,
       fileName: safeFileName,
       mimeType: input.fileType,
-      fileSize: input.fileSize,
+      fileSize: BigInt(input.fileSize),
       partSize: FILE_LIMITS.MULTIPART_PART_SIZE_BYTES,
       partCount,
       ownerId: userId,
@@ -261,7 +273,7 @@ export const getMultipartPartUrl = async (
   });
 
   const partUrl = await getSignedUrl(s3, command, {
-    expiresIn: FILE_LIMITS.UPLOAD_URL_EXPIRATION_MS,
+    expiresIn: FILE_LIMITS.UPLOAD_URL_EXPIRATION_SECONDS,
   });
 
   return {
@@ -312,7 +324,7 @@ export const completeMultipartUpload = async (
   const file = await registerObject(userId, {
     fileName: record.fileName,
     s3Key: record.s3Key,
-    fileSize: record.fileSize,
+    fileSize: Number(record.fileSize),
     mimeType: record.mimeType,
     deriveChecksum: false,
   });
@@ -377,7 +389,7 @@ export const listUserFiles = async (
   const page = hasMore ? files.slice(0, limit) : files;
   const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
 
-  return { files: page, nextCursor };
+  return { files: page.map(serializeFile), nextCursor };
 };
 
 const getOwnedFile = async (userId: string, fileId: string) => {
@@ -397,10 +409,11 @@ export const updateFileVisibility = async (
   visibility: Visibility,
 ) => {
   const file = await getOwnedFile(userId, fileId);
-  return prisma.file.update({
+  const updated = await prisma.file.update({
     where: { id: file.id },
     data: { visibility },
   });
+  return serializeFile(updated);
 };
 
 export const deleteFile = async (userId: string, fileId: string) => {
@@ -451,13 +464,13 @@ export const getDownloadUrl = async (
   });
 
   const downloadUrl = await getSignedUrl(s3, command, {
-    expiresIn: FILE_LIMITS.DOWNLOAD_URL_EXPIRATION_MS,
+    expiresIn: FILE_LIMITS.DOWNLOAD_URL_EXPIRATION_SECONDS,
   });
 
   return {
     downloadUrl,
     fileName: file.fileName,
-    fileSize: file.fileSize,
+    fileSize: Number(file.fileSize),
     mimeType: file.mimeType,
     visibility: file.visibility,
   };

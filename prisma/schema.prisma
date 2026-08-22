@@ -59,7 +59,8 @@ model File {
   id         String      @id @default(uuid())
   fileName   String
   s3Key      String
-  fileSize   Int
+  // BigInt: INTEGER overflows at ~2 GiB, which would break the 5 GB multipart path.
+  fileSize   BigInt
   mimeType   String
   etag       String?
   checksum   String?
@@ -77,7 +78,8 @@ model MultipartUpload {
   s3Key       String
   fileName    String
   mimeType    String
-  fileSize    Int
+  // BigInt: must hold sizes up to the 5 GB multipart limit (INTEGER overflows at ~2 GiB).
+  fileSize    BigInt
   partSize    Int
   partCount   Int
   ownerId     String

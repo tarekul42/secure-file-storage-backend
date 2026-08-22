@@ -10,12 +10,12 @@ describe("Health API", () => {
     await prisma.$disconnect();
   });
 
-  it("GET /health returns liveness", async () => {
+  it("GET /health returns liveness without runtime detail", async () => {
     const res = await request(app).get("/health");
 
     expect(res.status).toBe(200);
     expect(res.body.status).toBe("ok");
-    expect(typeof res.body.uptime).toBe("number");
+    expect(res.body.uptime).toBeUndefined();
   });
 
   it("GET /health/ready reports database and storage checks", async () => {

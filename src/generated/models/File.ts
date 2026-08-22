@@ -31,14 +31,14 @@ export type FileAvgAggregateOutputType = {
 }
 
 export type FileSumAggregateOutputType = {
-  fileSize: number | null
+  fileSize: bigint | null
 }
 
 export type FileMinAggregateOutputType = {
   id: string | null
   fileName: string | null
   s3Key: string | null
-  fileSize: number | null
+  fileSize: bigint | null
   mimeType: string | null
   etag: string | null
   checksum: string | null
@@ -53,7 +53,7 @@ export type FileMaxAggregateOutputType = {
   id: string | null
   fileName: string | null
   s3Key: string | null
-  fileSize: number | null
+  fileSize: bigint | null
   mimeType: string | null
   etag: string | null
   checksum: string | null
@@ -225,7 +225,7 @@ export type FileGroupByOutputType = {
   id: string
   fileName: string
   s3Key: string
-  fileSize: number
+  fileSize: bigint
   mimeType: string
   etag: string | null
   checksum: string | null
@@ -263,7 +263,7 @@ export type FileWhereInput = {
   id?: Prisma.StringFilter<"File"> | string
   fileName?: Prisma.StringFilter<"File"> | string
   s3Key?: Prisma.StringFilter<"File"> | string
-  fileSize?: Prisma.IntFilter<"File"> | number
+  fileSize?: Prisma.BigIntFilter<"File"> | bigint | number
   mimeType?: Prisma.StringFilter<"File"> | string
   etag?: Prisma.StringNullableFilter<"File"> | string | null
   checksum?: Prisma.StringNullableFilter<"File"> | string | null
@@ -298,7 +298,7 @@ export type FileWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.FileWhereInput | Prisma.FileWhereInput[]
   fileName?: Prisma.StringFilter<"File"> | string
   s3Key?: Prisma.StringFilter<"File"> | string
-  fileSize?: Prisma.IntFilter<"File"> | number
+  fileSize?: Prisma.BigIntFilter<"File"> | bigint | number
   mimeType?: Prisma.StringFilter<"File"> | string
   etag?: Prisma.StringNullableFilter<"File"> | string | null
   checksum?: Prisma.StringNullableFilter<"File"> | string | null
@@ -337,7 +337,7 @@ export type FileScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"File"> | string
   fileName?: Prisma.StringWithAggregatesFilter<"File"> | string
   s3Key?: Prisma.StringWithAggregatesFilter<"File"> | string
-  fileSize?: Prisma.IntWithAggregatesFilter<"File"> | number
+  fileSize?: Prisma.BigIntWithAggregatesFilter<"File"> | bigint | number
   mimeType?: Prisma.StringWithAggregatesFilter<"File"> | string
   etag?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
   checksum?: Prisma.StringNullableWithAggregatesFilter<"File"> | string | null
@@ -352,7 +352,7 @@ export type FileCreateInput = {
   id?: string
   fileName: string
   s3Key: string
-  fileSize: number
+  fileSize: bigint | number
   mimeType: string
   etag?: string | null
   checksum?: string | null
@@ -367,7 +367,7 @@ export type FileUncheckedCreateInput = {
   id?: string
   fileName: string
   s3Key: string
-  fileSize: number
+  fileSize: bigint | number
   mimeType: string
   etag?: string | null
   checksum?: string | null
@@ -382,7 +382,7 @@ export type FileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -397,7 +397,7 @@ export type FileUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -412,7 +412,7 @@ export type FileCreateManyInput = {
   id?: string
   fileName: string
   s3Key: string
-  fileSize: number
+  fileSize: bigint | number
   mimeType: string
   etag?: string | null
   checksum?: string | null
@@ -427,7 +427,7 @@ export type FileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -441,7 +441,7 @@ export type FileUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -565,7 +565,7 @@ export type FileCreateWithoutOwnerInput = {
   id?: string
   fileName: string
   s3Key: string
-  fileSize: number
+  fileSize: bigint | number
   mimeType: string
   etag?: string | null
   checksum?: string | null
@@ -579,7 +579,7 @@ export type FileUncheckedCreateWithoutOwnerInput = {
   id?: string
   fileName: string
   s3Key: string
-  fileSize: number
+  fileSize: bigint | number
   mimeType: string
   etag?: string | null
   checksum?: string | null
@@ -622,7 +622,7 @@ export type FileScalarWhereInput = {
   id?: Prisma.StringFilter<"File"> | string
   fileName?: Prisma.StringFilter<"File"> | string
   s3Key?: Prisma.StringFilter<"File"> | string
-  fileSize?: Prisma.IntFilter<"File"> | number
+  fileSize?: Prisma.BigIntFilter<"File"> | bigint | number
   mimeType?: Prisma.StringFilter<"File"> | string
   etag?: Prisma.StringNullableFilter<"File"> | string | null
   checksum?: Prisma.StringNullableFilter<"File"> | string | null
@@ -637,7 +637,7 @@ export type FileCreateManyOwnerInput = {
   id?: string
   fileName: string
   s3Key: string
-  fileSize: number
+  fileSize: bigint | number
   mimeType: string
   etag?: string | null
   checksum?: string | null
@@ -651,7 +651,7 @@ export type FileUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -665,7 +665,7 @@ export type FileUncheckedUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -679,7 +679,7 @@ export type FileUncheckedUpdateManyWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   etag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -774,7 +774,7 @@ export type $FilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     fileName: string
     s3Key: string
-    fileSize: number
+    fileSize: bigint
     mimeType: string
     etag: string | null
     checksum: string | null
@@ -1210,7 +1210,7 @@ export interface FileFieldRefs {
   readonly id: Prisma.FieldRef<"File", 'String'>
   readonly fileName: Prisma.FieldRef<"File", 'String'>
   readonly s3Key: Prisma.FieldRef<"File", 'String'>
-  readonly fileSize: Prisma.FieldRef<"File", 'Int'>
+  readonly fileSize: Prisma.FieldRef<"File", 'BigInt'>
   readonly mimeType: Prisma.FieldRef<"File", 'String'>
   readonly etag: Prisma.FieldRef<"File", 'String'>
   readonly checksum: Prisma.FieldRef<"File", 'String'>

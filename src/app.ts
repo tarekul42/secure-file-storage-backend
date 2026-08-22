@@ -13,6 +13,10 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import fileRoutes from "./modules/files/file.routes.js";
 import healthRoutes from "./modules/health/health.routes.js";
 import { logger } from "./utils/logger.js";
+import {
+  requestSerializer,
+  responseSerializer,
+} from "./utils/log-serializers.js";
 
 export const createApp = (): express.Express => {
   const app = express();
@@ -33,6 +37,11 @@ export const createApp = (): express.Express => {
         if (err || res.statusCode >= 500) return "error";
         if (res.statusCode >= 400) return "warn";
         return "info";
+      },
+      // Whitelist-only request/response serialization; see log-serializers.
+      serializers: {
+        req: requestSerializer,
+        res: responseSerializer,
       },
       autoLogging: env.NODE_ENV !== "test",
     }),

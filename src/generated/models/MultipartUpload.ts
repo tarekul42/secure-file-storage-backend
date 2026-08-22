@@ -33,7 +33,7 @@ export type MultipartUploadAvgAggregateOutputType = {
 }
 
 export type MultipartUploadSumAggregateOutputType = {
-  fileSize: number | null
+  fileSize: bigint | null
   partSize: number | null
   partCount: number | null
 }
@@ -44,7 +44,7 @@ export type MultipartUploadMinAggregateOutputType = {
   s3Key: string | null
   fileName: string | null
   mimeType: string | null
-  fileSize: number | null
+  fileSize: bigint | null
   partSize: number | null
   partCount: number | null
   ownerId: string | null
@@ -59,7 +59,7 @@ export type MultipartUploadMaxAggregateOutputType = {
   s3Key: string | null
   fileName: string | null
   mimeType: string | null
-  fileSize: number | null
+  fileSize: bigint | null
   partSize: number | null
   partCount: number | null
   ownerId: string | null
@@ -235,7 +235,7 @@ export type MultipartUploadGroupByOutputType = {
   s3Key: string
   fileName: string
   mimeType: string
-  fileSize: number
+  fileSize: bigint
   partSize: number
   partCount: number
   ownerId: string
@@ -273,7 +273,7 @@ export type MultipartUploadWhereInput = {
   s3Key?: Prisma.StringFilter<"MultipartUpload"> | string
   fileName?: Prisma.StringFilter<"MultipartUpload"> | string
   mimeType?: Prisma.StringFilter<"MultipartUpload"> | string
-  fileSize?: Prisma.IntFilter<"MultipartUpload"> | number
+  fileSize?: Prisma.BigIntFilter<"MultipartUpload"> | bigint | number
   partSize?: Prisma.IntFilter<"MultipartUpload"> | number
   partCount?: Prisma.IntFilter<"MultipartUpload"> | number
   ownerId?: Prisma.StringFilter<"MultipartUpload"> | string
@@ -308,7 +308,7 @@ export type MultipartUploadWhereUniqueInput = Prisma.AtLeast<{
   s3Key?: Prisma.StringFilter<"MultipartUpload"> | string
   fileName?: Prisma.StringFilter<"MultipartUpload"> | string
   mimeType?: Prisma.StringFilter<"MultipartUpload"> | string
-  fileSize?: Prisma.IntFilter<"MultipartUpload"> | number
+  fileSize?: Prisma.BigIntFilter<"MultipartUpload"> | bigint | number
   partSize?: Prisma.IntFilter<"MultipartUpload"> | number
   partCount?: Prisma.IntFilter<"MultipartUpload"> | number
   ownerId?: Prisma.StringFilter<"MultipartUpload"> | string
@@ -347,7 +347,7 @@ export type MultipartUploadScalarWhereWithAggregatesInput = {
   s3Key?: Prisma.StringWithAggregatesFilter<"MultipartUpload"> | string
   fileName?: Prisma.StringWithAggregatesFilter<"MultipartUpload"> | string
   mimeType?: Prisma.StringWithAggregatesFilter<"MultipartUpload"> | string
-  fileSize?: Prisma.IntWithAggregatesFilter<"MultipartUpload"> | number
+  fileSize?: Prisma.BigIntWithAggregatesFilter<"MultipartUpload"> | bigint | number
   partSize?: Prisma.IntWithAggregatesFilter<"MultipartUpload"> | number
   partCount?: Prisma.IntWithAggregatesFilter<"MultipartUpload"> | number
   ownerId?: Prisma.StringWithAggregatesFilter<"MultipartUpload"> | string
@@ -362,7 +362,7 @@ export type MultipartUploadCreateInput = {
   s3Key: string
   fileName: string
   mimeType: string
-  fileSize: number
+  fileSize: bigint | number
   partSize: number
   partCount: number
   completedAt?: Date | string | null
@@ -377,7 +377,7 @@ export type MultipartUploadUncheckedCreateInput = {
   s3Key: string
   fileName: string
   mimeType: string
-  fileSize: number
+  fileSize: bigint | number
   partSize: number
   partCount: number
   ownerId: string
@@ -392,7 +392,7 @@ export type MultipartUploadUpdateInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   partSize?: Prisma.IntFieldUpdateOperationsInput | number
   partCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -407,7 +407,7 @@ export type MultipartUploadUncheckedUpdateInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   partSize?: Prisma.IntFieldUpdateOperationsInput | number
   partCount?: Prisma.IntFieldUpdateOperationsInput | number
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -422,7 +422,7 @@ export type MultipartUploadCreateManyInput = {
   s3Key: string
   fileName: string
   mimeType: string
-  fileSize: number
+  fileSize: bigint | number
   partSize: number
   partCount: number
   ownerId: string
@@ -437,7 +437,7 @@ export type MultipartUploadUpdateManyMutationInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   partSize?: Prisma.IntFieldUpdateOperationsInput | number
   partCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -451,7 +451,7 @@ export type MultipartUploadUncheckedUpdateManyInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   partSize?: Prisma.IntFieldUpdateOperationsInput | number
   partCount?: Prisma.IntFieldUpdateOperationsInput | number
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -575,7 +575,7 @@ export type MultipartUploadCreateWithoutOwnerInput = {
   s3Key: string
   fileName: string
   mimeType: string
-  fileSize: number
+  fileSize: bigint | number
   partSize: number
   partCount: number
   completedAt?: Date | string | null
@@ -589,7 +589,7 @@ export type MultipartUploadUncheckedCreateWithoutOwnerInput = {
   s3Key: string
   fileName: string
   mimeType: string
-  fileSize: number
+  fileSize: bigint | number
   partSize: number
   partCount: number
   completedAt?: Date | string | null
@@ -632,7 +632,7 @@ export type MultipartUploadScalarWhereInput = {
   s3Key?: Prisma.StringFilter<"MultipartUpload"> | string
   fileName?: Prisma.StringFilter<"MultipartUpload"> | string
   mimeType?: Prisma.StringFilter<"MultipartUpload"> | string
-  fileSize?: Prisma.IntFilter<"MultipartUpload"> | number
+  fileSize?: Prisma.BigIntFilter<"MultipartUpload"> | bigint | number
   partSize?: Prisma.IntFilter<"MultipartUpload"> | number
   partCount?: Prisma.IntFilter<"MultipartUpload"> | number
   ownerId?: Prisma.StringFilter<"MultipartUpload"> | string
@@ -647,7 +647,7 @@ export type MultipartUploadCreateManyOwnerInput = {
   s3Key: string
   fileName: string
   mimeType: string
-  fileSize: number
+  fileSize: bigint | number
   partSize: number
   partCount: number
   completedAt?: Date | string | null
@@ -661,7 +661,7 @@ export type MultipartUploadUpdateWithoutOwnerInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   partSize?: Prisma.IntFieldUpdateOperationsInput | number
   partCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -675,7 +675,7 @@ export type MultipartUploadUncheckedUpdateWithoutOwnerInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   partSize?: Prisma.IntFieldUpdateOperationsInput | number
   partCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -689,7 +689,7 @@ export type MultipartUploadUncheckedUpdateManyWithoutOwnerInput = {
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
-  fileSize?: Prisma.IntFieldUpdateOperationsInput | number
+  fileSize?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   partSize?: Prisma.IntFieldUpdateOperationsInput | number
   partCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -784,7 +784,7 @@ export type $MultipartUploadPayload<ExtArgs extends runtime.Types.Extensions.Int
     s3Key: string
     fileName: string
     mimeType: string
-    fileSize: number
+    fileSize: bigint
     partSize: number
     partCount: number
     ownerId: string
@@ -1220,7 +1220,7 @@ export interface MultipartUploadFieldRefs {
   readonly s3Key: Prisma.FieldRef<"MultipartUpload", 'String'>
   readonly fileName: Prisma.FieldRef<"MultipartUpload", 'String'>
   readonly mimeType: Prisma.FieldRef<"MultipartUpload", 'String'>
-  readonly fileSize: Prisma.FieldRef<"MultipartUpload", 'Int'>
+  readonly fileSize: Prisma.FieldRef<"MultipartUpload", 'BigInt'>
   readonly partSize: Prisma.FieldRef<"MultipartUpload", 'Int'>
   readonly partCount: Prisma.FieldRef<"MultipartUpload", 'Int'>
   readonly ownerId: Prisma.FieldRef<"MultipartUpload", 'String'>

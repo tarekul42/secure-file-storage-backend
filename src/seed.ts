@@ -7,6 +7,16 @@ const DEMO_EMAIL = "demo@example.com";
 const DEMO_PASSWORD = "password123";
 const BCRYPT_SALT_ROUNDS = 10;
 
+// The seed creates an account with well-known public credentials. It must
+// never run against a production database unless explicitly forced.
+if (env.NODE_ENV === "production" && !process.argv.includes("--force")) {
+  console.error(
+    "Refusing to seed: NODE_ENV is production and the seed creates a" +
+      " publicly-known demo account. Pass --force to override.",
+  );
+  process.exit(1);
+}
+
 const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
