@@ -1,0 +1,113 @@
+import type { Request, Response } from "express";
+import type { AuthenticatedRequest } from "../../middleware/types.js";
+import { asyncHandler } from "../../utils/async-handler.js";
+import type { Visibility } from "./file.interfaces.js";
+import {
+  abortMultipartUpload,
+  completeMultipartUpload,
+  createFileMetadata,
+  deleteFile,
+  getDownloadUrl,
+  getMultipartPartUrl,
+  getPublicShare,
+  listUserFiles,
+  requestUploadUrl,
+  startMultipartUpload,
+  updateFileVisibility,
+} from "./file.service.js";
+
+const userIdOf = (req: AuthenticatedRequest): string => req.userId as string;
+
+const fileIdOf = (req: AuthenticatedRequest | Request): string =>
+  req.params.id as string;
+
+export const requestUpload = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const result = await requestUploadUrl(userIdOf(req), req.body);
+    res.json(result);
+  },
+);
+
+export const createMetadata = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const file = await createFileMetadata(userIdOf(req), req.body);
+    res.status(201).json(file);
+  },
+);
+
+export const startMultipart = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const result = await startMultipartUpload(userIdOf(req), req.body);
+    res.json(result);
+  },
+);
+
+export const partUrl = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const result = await getMultipartPartUrl(userIdOf(req), req.body);
+    res.json(result);
+  },
+);
+
+export const completeMultipart = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const file = await completeMultipartUpload(userIdOf(req), req.body);
+    res.status(201).json(file);
+  },
+);
+
+export const abortMultipart = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    await abortMultipartUpload(userIdOf(req), req.body);
+    res.status(204).send();
+  },
+);
+
+export const listFiles = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const result = await listUserFiles(userIdOf(req), {
+      ...(req.query.cursor !== undefined
+        ? { cursor: req.query.cursor as string }
+        : {}),
+      ...(req.query.limit !== undefined
+        ? { limit: Number(req.query.limit) }
+        : {}),
+    });
+    res.json(result);
+  },
+);
+
+export const updateVisibility = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const file = await updateFileVisibility(
+      userIdOf(req),
+      fileIdOf(req),
+      req.body.visibility as Visibility,
+    );
+    res.json(file);
+  },
+);
+
+export const removeFile = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    await deleteFile(userIdOf(req), fileIdOf(req));
+    res.status(204).send();
+  },
+);
+
+export const downloadFile = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const result = await getDownloadUrl({
+      fileId: fileIdOf(req),
+      userId: userIdOf(req),
+    });
+    res.json(result);
+  },
+);
+
+export const shareFile = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const result = await getPublicShare({ fileId: fileIdOf(req) });
+    res.json(result);
+  },
+);

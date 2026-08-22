@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id                 String               @id @default(uuid())
+  email              String               @unique
+  password           String
+  role               Role                 @default(USER)
+  isVerified         Boolean              @default(false)
+  tokenVersion       Int                  @default(0)
+  storageUsed        BigInt               @default(0)
+  storageLimit       BigInt               @default(1073741824)
+  files              File[]
+  refreshTokens      RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  multipartUploads   MultipartUpload[]
+  createdAt          DateTime             @default(now())
+}
+
+model RefreshToken {
+  id           String     @id @default(uuid())
+  tokenHash    String     @unique
+  familyId     String
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt    DateTime
+  replacedById String?    @unique
+  revokedAt    DateTime?
+  createdAt    DateTime   @default(now())
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model File {
+  id         String      @id @default(uuid())
+  fileName   String
+  s3Key      String
+  // BigInt: INTEGER overflows at ~2 GiB, which would break the 5 GB multipart path.
+  fileSize   BigInt
+  mimeType   String
+  etag       String?
+  checksum   String?
+  visibility Visibility  @default(PRIVATE)
+  parentId   String?
+  ownerId    String
+  owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model MultipartUpload {
+  id          String    @id @default(uuid())
+  uploadId    String    @unique
+  s3Key       String
+  fileName    String
+  mimeType    String
+  // BigInt: must hold sizes up to the 5 GB multipart limit (INTEGER overflows at ~2 GiB).
+  fileSize    BigInt
+  partSize    Int
+  partCount   Int
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  completedAt DateTime?
+  abortedAt   DateTime?
+  createdAt   DateTime  @default(now())
+}
