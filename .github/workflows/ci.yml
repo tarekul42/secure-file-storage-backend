@@ -38,7 +38,7 @@ jobs:
       # prisma.config.ts routes CLI commands (validate/migrate) through DIRECT_URL.
       DIRECT_URL: postgresql://postgres:postgres@localhost:5434/secure_file_storage_test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
@@ -89,7 +89,7 @@ jobs:
     env:
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
