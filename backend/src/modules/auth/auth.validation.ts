@@ -36,3 +36,25 @@ export const refreshTokenSchema = {
     refreshToken: z.string().trim().min(1, "refreshToken is required"),
   }),
 };
+
+export const forgotPasswordSchema = {
+  body: z.object({
+    email: z.string().trim().email("A valid email address is required"),
+  }),
+};
+
+export const resetPasswordSchema = {
+  body: z.object({
+    token: z.string().trim().min(1, "reset token is required"),
+    password: z
+      .string()
+      .min(
+        PASSWORD_POLICY.MIN_LENGTH,
+        `Password must be at least ${PASSWORD_POLICY.MIN_LENGTH} characters`,
+      )
+      .max(
+        PASSWORD_POLICY.MAX_LENGTH,
+        `Password must be at most ${PASSWORD_POLICY.MAX_LENGTH} characters`,
+      ),
+  }),
+};

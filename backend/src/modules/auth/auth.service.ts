@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
+import crypto from "node:crypto";
 import { env } from "../../config/env.js";
 import { prisma } from "../../db/prisma.js";
 import { ApiError } from "../../utils/errors.js";
@@ -8,11 +8,19 @@ import { AUTH } from "./auth.constants.js";
 import type {
   AuthResult,
   AuthUser,
+  ForgotPasswordInput,
   JwtPayload,
   LoginUserInput,
   RefreshResult,
   RegisterUserInput,
+  ResetPasswordInput,
 } from "./auth.interfaces.js";
+import { devMailer, type Mailer } from "./mailer.js";
+
+let mailer: Mailer = devMailer;
+export function configureMailer(m: Mailer) {
+  mailer = m;
+}
 
 const normalizeEmail = (email: string): string => email.trim().toLowerCase();
 
@@ -25,12 +33,12 @@ const hashToken = (token: string): string =>
 const generateRefreshToken = (): string =>
   crypto.randomBytes(48).toString("base64url");
 
-// Hash of an unknown random value. Compared against when the account does
-// not exist so login latency is dominated by bcrypt in both failure paths;
-// otherwise "unknown email" responds measurably faster than "wrong password"
-// and leaks which emails are registered.
-const DUMMY_PASSWORD_HASH =
-  "$2b$10$84yc74UQBnx9Y6d4Ufjx8.AdINI/oTMn9zvkRnVAzx1/xifqiWEHO";
+// Generate a fresh dummy hash using the configured bcrypt cost at
+// startup so the timing match is exact regardless of BCRYPT_COST.
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync(
+  "dummy-timing-placeholder",
+  env.BCRYPT_COST,
+);
 
 const toAuthUser = (user: {
   id: string;
@@ -271,5 +279,80 @@ export const revokeAllUserTokens = async (userId: string): Promise<void> => {
   await prisma.user.update({
     where: { id: userId },
     data: { tokenVersion: { increment: 1 } },
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Password reset
+
+export const forgotPassword = async (
+  input: ForgotPasswordInput,
+): Promise<void> => {
+  const email = normalizeEmail(input.email);
+
+  // Always resolve to the same response regardless of whether the
+  // account exists — prevents email enumeration.
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return;
+
+  // Invalidate any previously issued unused reset tokens for this user.
+  await prisma.passwordResetToken.updateMany({
+    where: { userId: user.id, usedAt: null },
+    data: { usedAt: new Date() },
+  });
+
+  const plaintext = crypto.randomBytes(32).toString("base64url");
+  await prisma.passwordResetToken.create({
+    data: {
+      tokenHash: hashToken(plaintext),
+      userId: user.id,
+      expiresAt: new Date(Date.now() + AUTH.RESET_TOKEN_TTL_MS),
+    },
+  });
+
+  const resetUrl = `${env.FRONTEND_ORIGIN}/reset-password?token=${encodeURIComponent(plaintext)}`;
+  await mailer.sendPasswordReset(email, resetUrl);
+};
+
+export const resetPassword = async (
+  input: ResetPasswordInput,
+): Promise<void> => {
+  const tokenHash = hashToken(input.token);
+
+  const record = await prisma.passwordResetToken.findFirst({
+    where: {
+      tokenHash,
+      usedAt: null,
+      expiresAt: { gt: new Date() },
+    },
+    include: { user: { select: { id: true } } },
+  });
+
+  if (!record) {
+    throw new ApiError(401, "Invalid or expired reset token");
+  }
+
+  const hashedPassword = await bcrypt.hash(input.password, env.BCRYPT_COST);
+
+  await prisma.$transaction(async (tx) => {
+    // Mark token single-use.
+    await tx.passwordResetToken.update({
+      where: { id: record.id },
+      data: { usedAt: new Date() },
+    });
+    // Set new password.
+    await tx.user.update({
+      where: { id: record.userId },
+      data: { password: hashedPassword },
+    });
+    // Invalidate every active session for this user.
+    await tx.refreshToken.updateMany({
+      where: { userId: record.userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    await tx.user.update({
+      where: { id: record.userId },
+      data: { tokenVersion: { increment: 1 } },
+    });
   });
 };

@@ -2,10 +2,12 @@ import type { Request, Response } from "express";
 import type { AuthenticatedRequest } from "../../middleware/types.js";
 import { asyncHandler } from "../../utils/async-handler.js";
 import {
+  forgotPassword,
   getUserById,
   loginUser,
   refreshAccessToken,
   registerUser,
+  resetPassword,
   revokeAllUserTokens,
   revokeRefreshToken,
 } from "./auth.service.js";
@@ -37,10 +39,26 @@ export const me = asyncHandler(
   },
 );
 
+export const forgotPassword = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    await forgotPassword(req.body);
+    res.status(200).json({
+      message: "If that account exists, a reset link has been sent.",
+    });
+  },
+);
+
 export const refresh = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const result = await refreshAccessToken(req.body.refreshToken);
     res.json(result);
+  },
+);
+
+export const resetPassword = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    await resetPassword(req.body);
+    res.status(200).json({ message: "Password reset successfully" });
   },
 );
 

@@ -56,6 +56,14 @@ const envSchema = z.object({
     .int()
     .positive()
     .default(1073741824),
+  // bcrypt cost for password hashing (10-14). Higher is slower but
+  // more resistant to brute-force; kept out of config/logs.
+  BCRYPT_COST: z.coerce
+    .number()
+    .int()
+    .min(10, "BCRYPT_COST must be at least 10")
+    .max(14, "BCRYPT_COST must be at most 14")
+    .default(10),
   ALLOWED_CONTENT_TYPES: z
     .string()
     .default(
